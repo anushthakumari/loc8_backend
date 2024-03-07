@@ -6,8 +6,7 @@ location_bp = Blueprint('location', __name__)
 
 @location_bp.route('/states', methods=['POST'])
 @token_required
-@superadmin_required
-def add_state():
+def add_state(current_user):
     data = request.get_json()
     state_name = data.get('state_name')
     zone_id = data.get('zone_id')
@@ -17,7 +16,7 @@ def add_state():
 
     query = "INSERT INTO states (state_name, zone_id) VALUES (%s, %s)"
     args = (state_name, zone_id)
-    query_db(query, args)
+    query_db(query, args, False, True)
 
     return jsonify({'message': 'State added successfully'}), 201
 
