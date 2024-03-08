@@ -15,7 +15,7 @@ def login():
         user = authenticate_user(email, password)
 
         if user:
-            token = generate_jwt_token(user['email'], user['role_id'])
+            token = generate_jwt_token(user['email'], user['role_id'], user['id'])
             return jsonify({'token': token, 'role_id': user['role_id'], 'first_name' : user['first_name'], 'last_name' : user['last_name'] })
         else:
             return jsonify({'message': 'Invalid credentials'}), 401

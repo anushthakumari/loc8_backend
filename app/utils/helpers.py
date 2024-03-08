@@ -3,6 +3,10 @@ from datetime import datetime, timedelta
 from functools import wraps
 from flask import request, jsonify, current_app
 from bcrypt import hashpw, gensalt
+import uuid
+
+def generate_uuid():
+    return str(uuid.uuid4())
 
 def token_required(func):
     @wraps(func)
@@ -21,15 +25,15 @@ def token_required(func):
         except jwt.InvalidTokenError:
             return jsonify({'message': 'Invalid token'}), 401
 
-        # Pass current_user as a keyword argument to the wrapped function
         return func(current_user=current_user, *args, **kwargs)
 
     return wrapper
 
-def generate_jwt_token(email, role_id):
+def generate_jwt_token(email, role_id, user_id):
     payload = {
         'sub': email,
         'role_id': role_id,
+        'id': user_id,
         'iat': datetime.utcnow(),
         'exp': datetime.utcnow() + timedelta(days=1)
     }
