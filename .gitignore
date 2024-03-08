@@ -1,3 +1,5 @@
+ByteTrack
 __pycache__
 app/uploads
+instance/*
 .env

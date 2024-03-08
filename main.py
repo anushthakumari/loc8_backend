@@ -343,8 +343,3 @@ def index():
             return jsonify({"error": str(e)})
 
     return jsonify({"msg": "working"})
-
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
