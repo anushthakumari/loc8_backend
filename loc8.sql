@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 07, 2024 at 07:55 PM
+-- Generation Time: Mar 08, 2024 at 10:04 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -32,6 +32,14 @@ CREATE TABLE `cities` (
   `city_name` varchar(50) NOT NULL,
   `state_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cities`
+--
+
+INSERT INTO `cities` (`city_id`, `city_name`, `state_id`) VALUES
+(2, 'A city', 4),
+(3, 'a city', 4);
 
 -- --------------------------------------------------------
 
@@ -70,7 +78,8 @@ CREATE TABLE `states` (
 --
 
 INSERT INTO `states` (`state_id`, `state_name`, `zone_id`) VALUES
-(4, 'Test', 2);
+(4, 'Test', 2),
+(5, 'another state', 1);
 
 -- --------------------------------------------------------
 
@@ -86,6 +95,7 @@ CREATE TABLE `users` (
   `first_name` varchar(100) DEFAULT NULL,
   `last_name` varchar(100) DEFAULT NULL,
   `employee_id` varchar(20) DEFAULT NULL,
+  `zone_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -94,8 +104,10 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `email`, `password`, `role_id`, `first_name`, `last_name`, `employee_id`, `created_at`, `updated_at`) VALUES
-(1, 'john@mail.com', '$2b$12$LGEvisGVlhfcCOF0R3KGD.EJNP4TZOyCv89zgHkbrC3Ucb5aO6x76', 3, 'John', 'Doe', '12345', '2024-03-06 18:00:33', '2024-03-06 18:30:10');
+INSERT INTO `users` (`id`, `email`, `password`, `role_id`, `first_name`, `last_name`, `employee_id`, `zone_id`, `created_at`, `updated_at`) VALUES
+(1, 'john@mail.com', '$2b$12$LGEvisGVlhfcCOF0R3KGD.EJNP4TZOyCv89zgHkbrC3Ucb5aO6x76', 3, 'John', 'Doe', '12345', 1, '2024-03-06 18:00:33', '2024-03-08 04:40:24'),
+(4, 'test@mail.com', '$2b$12$MFg9hjoXTUGbWJPLDdPSGe.Y1EVAAGOYjgBzB48GscAqMpGiq1lIK', 2, 'name', 'name', NULL, 1, '2024-03-08 06:20:21', '2024-03-08 06:20:21'),
+(5, 'john@mail.com', '$2b$12$LJ22wPtgLXJqADWg5K4TuOELNDTk47Gg/SXn4aYEZEA1NYx8HIhU6', 1, 'name', 'name', NULL, 3, '2024-03-08 07:33:55', '2024-03-08 07:33:55');
 
 -- --------------------------------------------------------
 
@@ -164,7 +176,7 @@ ALTER TABLE `zones`
 -- AUTO_INCREMENT for table `cities`
 --
 ALTER TABLE `cities`
-  MODIFY `city_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `city_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -176,13 +188,13 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `states`
 --
 ALTER TABLE `states`
-  MODIFY `state_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `state_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `zones`

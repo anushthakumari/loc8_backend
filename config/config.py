@@ -7,3 +7,4 @@ class AppConfig:
     MYSQL_USER = os.environ.get('MYSQL_USER') or 'your_default_mysql_user'
     MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD') or ''
     MYSQL_DB = os.environ.get('MYSQL_DB') or 'your_default_mysql_db'
+    UPLOAD_FOLDER = "./app/uploads"

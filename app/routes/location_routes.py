@@ -22,8 +22,7 @@ def add_state(current_user):
 
 @location_bp.route('/cities', methods=['POST'])
 @token_required
-@superadmin_required
-def add_city():
+def add_city(current_user):
     data = request.get_json()
     city_name = data.get('city_name')
     state_id = data.get('state_id')
@@ -33,7 +32,7 @@ def add_city():
 
     query = "INSERT INTO cities (city_name, state_id) VALUES (%s, %s)"
     args = (city_name, state_id)
-    query_db(query, args)
+    query_db(query, args, False, True)
 
     return jsonify({'message': 'City added successfully'}), 201
 
@@ -46,13 +45,13 @@ def get_zones(current_user):
 
 @location_bp.route('/states', methods=['GET'])
 @token_required
-def get_states():
+def get_states(current_user):
     zone_id = request.args.get('zone_id')
     if zone_id:
-        query = "SELECT * FROM states WHERE zone_id = %s"
+        query = "SELECT * FROM states inner join zones on zones.zone_id=states.zone_id WHERE states.zone_id = %s"
         args = (zone_id,)
     else:
-        query = "SELECT * FROM states"
+        query = "SELECT * FROM states inner join zones on zones.zone_id=states.zone_id"
         args = ()
 
     states = query_db(query, args)
@@ -60,14 +59,14 @@ def get_states():
 
 @location_bp.route('/cities', methods=['GET'])
 @token_required
-def get_cities():
+def get_cities(current_user):
     state_id = request.args.get('state_id') 
 
     if state_id:
-        query = "SELECT * FROM cities WHERE state_id = %s"
+        query = "SELECT * FROM cities inner join states on cities.state_id=states.state_id WHERE cities.state_id = %s"
         args = (state_id,)
     else:
-        query = "SELECT * FROM cities"
+        query = "SELECT * FROM cities inner join states on cities.state_id=states.state_id"
         args = ()
 
     cities = query_db(query, args)

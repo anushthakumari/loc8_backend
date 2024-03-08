@@ -2,6 +2,7 @@ import jwt
 from datetime import datetime, timedelta
 from functools import wraps
 from flask import request, jsonify, current_app
+from bcrypt import hashpw, gensalt
 
 def token_required(func):
     @wraps(func)
@@ -49,3 +50,13 @@ def superadmin_required(func):
         return func(current_user=current_user, *args, **kwargs)
 
     return wrapper
+
+def clean_and_lower(value):
+    if isinstance(value, str):
+        return value.strip().lower()
+    else:
+        return value
+
+def generate_bcrypt_hash(password):
+    hashed_password = hashpw(password.encode('utf-8'), gensalt())
+    return hashed_password.decode('utf-8')
