@@ -1,6 +1,5 @@
-
 import os
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_from_directory
 from app.utils.helpers import token_required
 from config.config import AppConfig
 from werkzeug.utils import secure_filename
@@ -11,6 +10,24 @@ from app.utils.helpers import generate_uuid
 video_bp = Blueprint('videos', __name__)
 
 TARGET_VIDEO_PATH = f"./instance/"
+
+@video_bp.route('/', methods=['GET',])
+@token_required
+def get_all_videos(current_user):
+    video_q = """
+        SELECT 	billboards.*, 
+                videofiles.filename, videofiles.video_path, 
+                videofiles.created_at, videofiles.created_by_user_id,
+                states.state_name, cities.city_name, zones.zone_name
+        FROM billboards
+        JOIN videofiles ON billboards.video_id = videofiles.video_id
+        JOIN states ON videofiles.state_id = states.state_id
+        JOIN cities ON videofiles.city_id = cities.city_id
+        JOIN zones ON videofiles.zone_id = zones.zone_id;
+    """
+    video_details = query_db(video_q, ())
+
+    return jsonify(video_details), 200
 
 @video_bp.route('/upload', methods=['POST',])
 @token_required
@@ -24,8 +41,8 @@ def upload(current_user):
         return jsonify({"error": "no file"})
 
     dest = os.path.join(AppConfig.UPLOAD_FOLDER, secure_filename(video_file.filename))
-    filename = generate_uuid() + ".mp4"
-    output_file_path = os.path.join(TARGET_VIDEO_PATH, secure_filename(filename))
+    filename = secure_filename(generate_uuid() + ".mp4")
+    output_file_path = os.path.join(TARGET_VIDEO_PATH, filename)
 
     video_file.save(dest)
 
@@ -33,7 +50,7 @@ def upload(current_user):
     vcd2 = str(vcd)
     vcd3 = vcd2[0:2]
 
-    video_id = insert_video_data(output_file_path, zone_id, state_id, city_id, current_user['id'])
+    video_id = insert_video_data(output_file_path, filename, zone_id, state_id, city_id, current_user['id'])
     insert_billboard_data(video_id, vcd)
 
     bill_q = "SELECT * FROM billboards WHERE video_id = %s";
@@ -55,6 +72,7 @@ def processed_output(current_user,video_id):
    
     video_q = """
         SELECT  v.video_id, 
+                v.filename,
                 v.video_path, 
                 z.zone_name, 
                 s.state_name, 
@@ -117,14 +135,13 @@ def merge_billborads(current_user):
 
     return jsonify({"message": "Merge successful"}), 200
 
-
-def insert_video_data(output_file_path, zone_id, state_id, city_id, created_by_user_id):
+def insert_video_data(output_file_path, filename, zone_id, state_id, city_id, created_by_user_id):
     video_query = """
-        INSERT INTO videofiles (video_id, video_path, zone_id, state_id, city_id, created_by_user_id)
-        VALUES (%s, %s, %s, %s, %s, %s);
+        INSERT INTO videofiles (video_id, filename, video_path, zone_id, state_id, city_id, created_by_user_id)
+        VALUES (%s, %s, %s, %s, %s, %s, %s);
     """
     video_id = generate_uuid()
-    video_args = (video_id, output_file_path, zone_id, state_id, city_id, created_by_user_id)
+    video_args = (video_id, filename, output_file_path, zone_id, state_id, city_id, created_by_user_id)
     query_db(video_query, video_args, False, True)
     return video_id
 

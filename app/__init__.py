@@ -4,7 +4,7 @@ from config.config import AppConfig
 from app.utils.db_helper import init_db
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="/processed_videos", static_folder="../instance")
 app.config.from_object(AppConfig)
 
 app.mysql = init_db(app) 
