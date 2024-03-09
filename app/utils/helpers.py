@@ -8,6 +8,7 @@ import uuid
 def generate_uuid():
     return str(uuid.uuid4())
 
+
 def token_required(func):
     @wraps(func)
     def wrapper(*args, **kwargs):

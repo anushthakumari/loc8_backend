@@ -54,7 +54,7 @@ np.bool = bool
 
 CLASS_NAMES_DICT = "BillBoard"
 CLASS_ID = [0]
-TARGET_VIDEO_PATH = f"./instance/BillBoardDetectionandCounting.mp4"
+# TARGET_VIDEO_PATH = f"./instance/BillBoardDetectionandCounting.mp4"
 
 # converts Detections into format that can be consumed by match_detections_with_tracks function
 def detections2boxes(detections: Detections) -> np.ndarray:
@@ -169,7 +169,10 @@ def write_text(image, label, pos = (0,0),font=cv2.FONT_ITALIC, font_scale=1.1, t
     return text_size
 
 y_thres = 70
-def draw_bounding_boxes(File):
+def draw_bounding_boxes(File, output_file_path):
+
+    TARGET_VIDEO_PATH = output_file_path
+
     byte_tracker = BYTETracker(BYTETrackerArgs())
     video_info = VideoInfo.from_video_path(File)
     generator = get_video_frames_generator(File)
@@ -301,12 +304,10 @@ def draw_bounding_boxes(File):
 
 
 
-def video_processing(dest):
-    vcd =draw_bounding_boxes(dest)
+def video_processing(dest, output_file_path=f"./instance/BillBoardDetectionandCounting.mp4"):
+    vcd =draw_bounding_boxes(dest, output_file_path)
     print(vcd)
     return vcd
-
-
 
 
 app = Flask(__name__)

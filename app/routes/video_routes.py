@@ -10,6 +10,8 @@ from app.utils.helpers import generate_uuid
 
 video_bp = Blueprint('videos', __name__)
 
+TARGET_VIDEO_PATH = f"./instance/"
+
 @video_bp.route('/upload', methods=['POST',])
 @token_required
 def upload(current_user):
@@ -22,16 +24,19 @@ def upload(current_user):
         return jsonify({"error": "no file"})
 
     dest = os.path.join(AppConfig.UPLOAD_FOLDER, secure_filename(video_file.filename))
+    filename = generate_uuid() + ".mp4"
+    output_file_path = os.path.join(TARGET_VIDEO_PATH, secure_filename(filename))
+
     video_file.save(dest)
 
-    vcd = video_processing(dest)
+    vcd = video_processing(dest, output_file_path)
     vcd2 = str(vcd)
     vcd3 = vcd2[0:2]
 
-    video_id = insert_video_data(zone_id, state_id, city_id, current_user['id'])
+    video_id = insert_video_data(output_file_path, zone_id, state_id, city_id, current_user['id'])
     insert_billboard_data(video_id, vcd)
 
-    bill_q = "SELECT * FROM billborads WHERE video_id = %s";
+    bill_q = "SELECT * FROM billboards WHERE video_id = %s";
     billboards = query_db(bill_q, (video_id,))
    
     video_q = "SELECT * FROM videofiles WHERE video_id = %s";
@@ -42,24 +47,98 @@ def upload(current_user):
     return jsonify({"billboards":  billboards, "video_details": video_details}), 200
 
 
-def insert_video_data(zone_id, state_id, city_id, created_by_user_id):
+@video_bp.route('/output/<video_id>', methods=['GET',])
+@token_required
+def processed_output(current_user,video_id):
+    bill_q = "SELECT * FROM billboards WHERE video_id = %s ORDER BY tracker_id ASC";
+    billboards = query_db(bill_q, (video_id,))
+   
+    video_q = """
+        SELECT  v.video_id, 
+                v.video_path, 
+                z.zone_name, 
+                s.state_name, 
+                c.city_name, 
+                v.created_at, 
+                v.created_by_user_id
+        FROM videofiles v
+        JOIN zones z ON v.zone_id = z.zone_id
+        JOIN states s ON v.state_id = s.state_id
+        JOIN cities c ON v.city_id = c.city_id
+        WHERE v.video_id = %s;
+    """
+    video_details = query_db(video_q, (video_id,), True)
+
+    return jsonify({"billboards":  billboards, "video_details": video_details}), 200
+
+@video_bp.route('/billboards/merge', methods=['POST'])
+@token_required
+def merge_billborads(current_user):
+    data = request.get_json()
+    billboard_ids = data.get('billboard_ids', [])
+
+    if not billboard_ids:
+        return jsonify({"error": "No billboard IDs provided"}), 400
+    
+    new_billboard_id = generate_uuid()
+
+    query_merge_sum_average = f"""
+        INSERT INTO billboards (id, video_id, visibility_duration, distance_to_center, central_duration, near_p_duration, 
+                                mid_p_duration, far_p_duration, central_distance, near_p_distance, mid_p_distance, 
+                                far_p_distance, average_areas, confidence, tracker_id)
+        SELECT
+            %s,
+            video_id,
+            SUM(visibility_duration) AS visibility_duration_sum,
+            SUM(distance_to_center) AS distance_to_center_sum,
+            SUM(central_duration) AS central_duration_sum,
+            SUM(near_p_duration) AS near_p_duration_sum,
+            SUM(mid_p_duration) AS mid_p_duration_sum,
+            SUM(far_p_duration) AS far_p_duration_sum,
+            SUM(central_distance) AS central_distance_sum,
+            SUM(near_p_distance) AS near_p_distance_sum,
+            SUM(mid_p_distance) AS mid_p_distance_sum,
+            SUM(far_p_distance) AS far_p_distance_sum,
+            AVG(average_areas) AS average_areas_avg,
+            AVG(confidence) AS confidence_avg,
+            MAX(tracker_id) AS tracker_id
+        FROM billboards
+        WHERE id IN ({','.join(['%s']*len(billboard_ids))})
+        GROUP BY video_id
+    """
+
+    query_db(query_merge_sum_average, (new_billboard_id, *billboard_ids), False, True)
+
+    query_delete_previous_rows = f"""
+        DELETE FROM billboards
+        WHERE id IN ({','.join(['%s']*len(billboard_ids))})
+    """
+    query_db(query_delete_previous_rows, tuple(billboard_ids), False, True)
+
+    return jsonify({"message": "Merge successful"}), 200
+
+
+def insert_video_data(output_file_path, zone_id, state_id, city_id, created_by_user_id):
     video_query = """
-        INSERT INTO videofiles (video_id, zone_id, state_id, city_id, created_by_user_id)
-        VALUES (%s, %s, %s, %s, %s);
+        INSERT INTO videofiles (video_id, video_path, zone_id, state_id, city_id, created_by_user_id)
+        VALUES (%s, %s, %s, %s, %s, %s);
     """
     video_id = generate_uuid()
-    video_args = (video_id, zone_id, state_id, city_id, created_by_user_id)
+    video_args = (video_id, output_file_path, zone_id, state_id, city_id, created_by_user_id)
     query_db(video_query, video_args, False, True)
     return video_id
 
 def insert_billboard_data(video_id, billboard_data):
-    for serial, data in billboard_data.items():
+    for tracker_id, data in billboard_data.items():
+
+        bill_id = generate_uuid();
         billboard_query = """
-            INSERT INTO billboards (video_id, visibility_duration, distance_to_center, central_duration, near_p_duration, mid_p_duration, far_p_duration, 
-                                    central_distance, near_p_distance, mid_p_distance, far_p_distance, average_areas, confidence, serial)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+            INSERT INTO billboards (id, video_id, visibility_duration, distance_to_center, central_duration, near_p_duration, mid_p_duration, far_p_duration, 
+                                    central_distance, near_p_distance, mid_p_distance, far_p_distance, average_areas, confidence, tracker_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """
         billboard_args = (
+            bill_id,
             video_id,
             data['visibility_duration'],
             data['distance_to_center'],
@@ -73,6 +152,6 @@ def insert_billboard_data(video_id, billboard_data):
             data['BillBoard_Region_Duration and Distance']['Far P Dist'],
             data['Average Areas'],
             data['Confidence'],
-            serial
+            tracker_id
         )
         query_db(billboard_query, billboard_args, False, True)
