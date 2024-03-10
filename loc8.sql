@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 08, 2024 at 10:04 AM
+-- Generation Time: Mar 10, 2024 at 02:49 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -24,6 +24,39 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `billboards`
+--
+
+CREATE TABLE `billboards` (
+  `id` varchar(36) NOT NULL,
+  `video_id` varchar(36) DEFAULT NULL,
+  `visibility_duration` float DEFAULT NULL,
+  `distance_to_center` float DEFAULT NULL,
+  `central_duration` float DEFAULT NULL,
+  `near_p_duration` float DEFAULT NULL,
+  `mid_p_duration` float DEFAULT NULL,
+  `far_p_duration` float DEFAULT NULL,
+  `central_distance` float DEFAULT NULL,
+  `near_p_distance` float DEFAULT NULL,
+  `mid_p_distance` float DEFAULT NULL,
+  `far_p_distance` float DEFAULT NULL,
+  `average_areas` float DEFAULT NULL,
+  `confidence` float DEFAULT NULL,
+  `tracker_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `billboards`
+--
+
+INSERT INTO `billboards` (`id`, `video_id`, `visibility_duration`, `distance_to_center`, `central_duration`, `near_p_duration`, `mid_p_duration`, `far_p_duration`, `central_distance`, `near_p_distance`, `mid_p_distance`, `far_p_distance`, `average_areas`, `confidence`, `tracker_id`) VALUES
+('56ad96ae-e20e-4545-a571-1c8b236d95ec', 'b96bdfcf-6959-400e-9c5f-2e1eefd938d1', 2, 42.2873, 0, 0, 0.966667, 1.03333, 0, 0, 77.9903, 86.8466, 3.0619, 0.670036, 1),
+('8496fa2b-d73d-42da-98f8-37a3137350df', 'b96bdfcf-6959-400e-9c5f-2e1eefd938d1', 4.36667, 42.2614, 0, 1.83333, 1.56667, 0.766667, 0, 66.924, 75.9757, 87.507, 2.39415, 0.706747, 2),
+('ded129eb-f382-45f7-8f13-b29674aaee3e', 'b96bdfcf-6959-400e-9c5f-2e1eefd938d1', 3.83333, 37.7746, 0.233333, 3.13333, 0.466667, 0, 60.0628, 126.889, 72.5264, 0, 1.40527, 0.707758, 4);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `cities`
 --
 
@@ -38,8 +71,7 @@ CREATE TABLE `cities` (
 --
 
 INSERT INTO `cities` (`city_id`, `city_name`, `state_id`) VALUES
-(2, 'A city', 4),
-(3, 'a city', 4);
+(6, 'new york city', 9);
 
 -- --------------------------------------------------------
 
@@ -78,8 +110,7 @@ CREATE TABLE `states` (
 --
 
 INSERT INTO `states` (`state_id`, `state_name`, `zone_id`) VALUES
-(4, 'Test', 2),
-(5, 'another state', 1);
+(9, 'new york state', 5);
 
 -- --------------------------------------------------------
 
@@ -107,7 +138,31 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `email`, `password`, `role_id`, `first_name`, `last_name`, `employee_id`, `zone_id`, `created_at`, `updated_at`) VALUES
 (1, 'john@mail.com', '$2b$12$LGEvisGVlhfcCOF0R3KGD.EJNP4TZOyCv89zgHkbrC3Ucb5aO6x76', 3, 'John', 'Doe', '12345', 1, '2024-03-06 18:00:33', '2024-03-08 04:40:24'),
 (4, 'test@mail.com', '$2b$12$MFg9hjoXTUGbWJPLDdPSGe.Y1EVAAGOYjgBzB48GscAqMpGiq1lIK', 2, 'name', 'name', NULL, 1, '2024-03-08 06:20:21', '2024-03-08 06:20:21'),
-(5, 'john@mail.com', '$2b$12$LJ22wPtgLXJqADWg5K4TuOELNDTk47Gg/SXn4aYEZEA1NYx8HIhU6', 1, 'name', 'name', NULL, 3, '2024-03-08 07:33:55', '2024-03-08 07:33:55');
+(9, 'anushthakumari12345@gmail.com', '$2b$12$qe2C.Rdodi2pDi3xxQeiGOe8GxQdg0ERQQtYh9oPQr1oDFXq84qE.', 1, 'anushtha', 'pandit', '89562', 1, '2024-03-10 13:40:31', '2024-03-10 13:40:31');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `videofiles`
+--
+
+CREATE TABLE `videofiles` (
+  `video_id` varchar(36) NOT NULL,
+  `filename` varchar(255) NOT NULL,
+  `zone_id` int(11) DEFAULT NULL,
+  `state_id` int(11) DEFAULT NULL,
+  `city_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by_user_id` int(11) DEFAULT NULL,
+  `video_path` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `videofiles`
+--
+
+INSERT INTO `videofiles` (`video_id`, `filename`, `zone_id`, `state_id`, `city_id`, `created_at`, `created_by_user_id`, `video_path`) VALUES
+('b96bdfcf-6959-400e-9c5f-2e1eefd938d1', '2beda1b5-5ddb-431f-9b78-7852a66ad944.mp4', 5, 9, 6, '2024-03-10 13:47:46', 1, './instance/2beda1b5-5ddb-431f-9b78-7852a66ad944.mp4');
 
 -- --------------------------------------------------------
 
@@ -128,17 +183,26 @@ INSERT INTO `zones` (`zone_id`, `zone_name`) VALUES
 (1, 'North'),
 (2, 'South'),
 (3, 'West'),
-(4, 'East');
+(4, 'East'),
+(5, 'North East');
 
 --
 -- Indexes for dumped tables
 --
 
 --
+-- Indexes for table `billboards`
+--
+ALTER TABLE `billboards`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `video_id` (`video_id`);
+
+--
 -- Indexes for table `cities`
 --
 ALTER TABLE `cities`
   ADD PRIMARY KEY (`city_id`),
+  ADD UNIQUE KEY `city_name` (`city_name`),
   ADD KEY `state_id` (`state_id`);
 
 --
@@ -160,7 +224,19 @@ ALTER TABLE `states`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`,`employee_id`),
   ADD KEY `role_id` (`role_id`);
+
+--
+-- Indexes for table `videofiles`
+--
+ALTER TABLE `videofiles`
+  ADD PRIMARY KEY (`video_id`),
+  ADD UNIQUE KEY `video_path` (`video_path`),
+  ADD KEY `zone_id` (`zone_id`),
+  ADD KEY `state_id` (`state_id`),
+  ADD KEY `city_id` (`city_id`),
+  ADD KEY `created_by_user_id` (`created_by_user_id`);
 
 --
 -- Indexes for table `zones`
@@ -176,7 +252,7 @@ ALTER TABLE `zones`
 -- AUTO_INCREMENT for table `cities`
 --
 ALTER TABLE `cities`
-  MODIFY `city_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `city_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -188,23 +264,29 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `states`
 --
 ALTER TABLE `states`
-  MODIFY `state_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `state_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `zones`
 --
 ALTER TABLE `zones`
-  MODIFY `zone_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `zone_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `billboards`
+--
+ALTER TABLE `billboards`
+  ADD CONSTRAINT `billboards_ibfk_1` FOREIGN KEY (`video_id`) REFERENCES `videofiles` (`video_id`);
 
 --
 -- Constraints for table `cities`
@@ -223,6 +305,15 @@ ALTER TABLE `states`
 --
 ALTER TABLE `users`
   ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`);
+
+--
+-- Constraints for table `videofiles`
+--
+ALTER TABLE `videofiles`
+  ADD CONSTRAINT `videofiles_ibfk_1` FOREIGN KEY (`zone_id`) REFERENCES `zones` (`zone_id`),
+  ADD CONSTRAINT `videofiles_ibfk_2` FOREIGN KEY (`state_id`) REFERENCES `states` (`state_id`),
+  ADD CONSTRAINT `videofiles_ibfk_3` FOREIGN KEY (`city_id`) REFERENCES `cities` (`city_id`),
+  ADD CONSTRAINT `videofiles_ibfk_4` FOREIGN KEY (`created_by_user_id`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
