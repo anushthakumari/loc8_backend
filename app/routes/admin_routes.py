@@ -42,7 +42,7 @@ def add_user(current_user):
         data['role_id'], 
         clean_and_lower(data.get('first_name')), 
         clean_and_lower(data.get('last_name')), 
-        clean_and_lower(data.get('employee_id')), 
+        clean_and_lower(data.get('emp_id')), 
         data['zone_id']
     )
     query_db(query, args, False, True)
