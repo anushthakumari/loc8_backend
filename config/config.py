@@ -2,9 +2,17 @@ import os
 
 class AppConfig:
     DEBUG = True
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'your_default_secret_key'
-    MYSQL_HOST = os.environ.get('MYSQL_HOST') or 'localhost'
-    MYSQL_USER = os.environ.get('MYSQL_USER') or 'your_default_mysql_user'
-    MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD') or ''
-    MYSQL_DB = os.environ.get('MYSQL_DB') or 'your_default_mysql_db'
+    SECRET_KEY = 'testref'
+    MYSQL_HOST = 'localhost'
+    MYSQL_USER =  'root'
+    MYSQL_PASSWORD = ''
+    MYSQL_DB = 'loc8'
     UPLOAD_FOLDER = "./app/uploads"
+# class AppConfig:
+#     DEBUG = True
+#     SECRET_KEY = 'testref'
+#     MYSQL_HOST = 'db4free.net'
+#     MYSQL_USER =  'loc_loc12'
+#     MYSQL_PASSWORD = 'loc_loc12'
+#     MYSQL_DB = 'loc_loc12'
+#     UPLOAD_FOLDER = "./app/uploads"

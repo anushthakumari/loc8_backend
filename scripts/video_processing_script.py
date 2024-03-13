@@ -34,6 +34,7 @@ from supervision.tools.detections import Detections, BoxAnnotator
 from supervision.tools.line_counter import LineCounter, LineCounterAnnotator
 from typing import List
 from ultralytics import YOLO
+from moviepy.editor import VideoFileClip
 
 
 @dataclass(frozen=True)
@@ -72,6 +73,10 @@ def tracks2boxes(tracks: List[STrack]) -> np.ndarray:
         in tracks
     ], dtype=float)
 
+
+def convert_to_mp4(input_file, output_file):
+    video_clip = VideoFileClip(input_file)
+    video_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
 
 # matches our bounding boxes with predictions
 def match_detections_with_tracks(
@@ -248,6 +253,8 @@ def draw_bounding_boxes(File, output_file_path):
 
     # Release the VideoWriter object
     output_video.release()
+
+    convert_to_mp4(output_file_path, output_file_path)
 
     # After processing all frames, calculate the duration of visibility and distance to center for each billboard
     visibility_durations = {}

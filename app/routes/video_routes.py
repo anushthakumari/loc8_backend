@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, request, jsonify, send_from_directory
+from flask import Blueprint, request, jsonify, send_from_directory,abort, send_file
 from app.utils.helpers import token_required
 from config.config import AppConfig
 from werkzeug.utils import secure_filename
@@ -10,6 +10,17 @@ from app.utils.helpers import generate_uuid
 video_bp = Blueprint('videos', __name__)
 
 TARGET_VIDEO_PATH = f"./instance/"
+
+@video_bp.route('/uploads/<filename>')
+def stream_video(filename):
+
+    UPLOAD_FOLDER = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'instance'))
+    video_path = os.path.join(UPLOAD_FOLDER, filename+".mp4")
+    print(video_path)
+    if not os.path.isfile(video_path):  # Prevent unauthorized access
+        return abort(401)
+    return send_file(video_path, mimetype='video/mp4', as_attachment=False) 
+
 
 @video_bp.route('/', methods=['GET',])
 @token_required
