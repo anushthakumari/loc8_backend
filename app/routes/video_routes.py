@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from scripts.video_processing_script import video_processing
 from app.utils.db_helper import query_db
 from app.utils.helpers import generate_uuid
+from app.constants.roles import roles
 
 video_bp = Blueprint('videos', __name__)
 
@@ -25,20 +26,44 @@ def stream_video(filename):
 @video_bp.route('/', methods=['GET',])
 @token_required
 def get_all_videos(current_user):
-    video_q = """
-        SELECT 	billboards.*, 
-                videofiles.filename, videofiles.video_path, 
-                videofiles.created_at, videofiles.created_by_user_id,
-                states.state_name, cities.city_name, zones.zone_name
-        FROM billboards
-        JOIN videofiles ON billboards.video_id = videofiles.video_id
-        JOIN states ON videofiles.state_id = states.state_id
-        JOIN cities ON videofiles.city_id = cities.city_id
-        JOIN zones ON videofiles.zone_id = zones.zone_id;
-    """
-    video_details = query_db(video_q, ())
 
-    return jsonify(video_details), 200
+    user_role_id = current_user['role_id']
+    user_id = current_user['id']
+    video_q = ""
+
+    if user_role_id == roles.get('SUPERADMIN'):
+         video_q = """
+            SELECT 	billboards.*, 
+                    videofiles.filename, videofiles.video_path, 
+                    videofiles.created_at, videofiles.created_by_user_id,
+                    states.state_name, cities.city_name, zones.zone_name
+            FROM billboards
+            JOIN videofiles ON billboards.video_id = videofiles.video_id
+            JOIN states ON videofiles.state_id = states.state_id
+            JOIN cities ON videofiles.city_id = cities.city_id
+            JOIN zones ON videofiles.zone_id = zones.zone_id;
+         """
+
+         video_details = query_db(video_q, ())
+
+         return jsonify(video_details), 200
+
+    else: 
+        video_q = """
+        SELECT 	billboards.*, 
+                    videofiles.filename, videofiles.video_path, 
+                    videofiles.created_at, videofiles.created_by_user_id,
+                    states.state_name, cities.city_name, zones.zone_name
+            FROM billboards
+            JOIN videofiles ON billboards.video_id = videofiles.video_id
+            JOIN states ON videofiles.state_id = states.state_id
+            JOIN cities ON videofiles.city_id = cities.city_id
+            JOIN zones ON videofiles.zone_id = zones.zone_id
+            WHERE videofiles.created_by_user_id = %s
+        """
+        video_details = query_db(video_q, (user_id,))
+
+        return jsonify(video_details), 200
 
 @video_bp.route('/upload', methods=['POST',])
 @token_required
@@ -62,7 +87,7 @@ def upload(current_user):
     vcd3 = vcd2[0:2]
 
     video_id = insert_video_data(output_file_path, filename, zone_id, state_id, city_id, current_user['id'])
-    insert_billboard_data(video_id, vcd)
+    insert_billboard_data(video_id, current_user['id'], vcd)
 
     bill_q = "SELECT * FROM billboards WHERE video_id = %s";
     billboards = query_db(bill_q, (video_id,))
@@ -105,6 +130,7 @@ def processed_output(current_user,video_id):
 def merge_billborads(current_user):
     data = request.get_json()
     billboard_ids = data.get('billboard_ids', [])
+    user_id = current_user['id']
 
     if not billboard_ids:
         return jsonify({"error": "No billboard IDs provided"}), 400
@@ -114,7 +140,7 @@ def merge_billborads(current_user):
     query_merge_sum_average = f"""
         INSERT INTO billboards (id, video_id, visibility_duration, distance_to_center, central_duration, near_p_duration, 
                                 mid_p_duration, far_p_duration, central_distance, near_p_distance, mid_p_distance, 
-                                far_p_distance, average_areas, confidence, tracker_id)
+                                far_p_distance, average_areas, confidence, tracker_id, created_by_user_id)
         SELECT
             %s,
             video_id,
@@ -130,7 +156,8 @@ def merge_billborads(current_user):
             SUM(far_p_distance) AS far_p_distance_sum,
             AVG(average_areas) AS average_areas_avg,
             AVG(confidence) AS confidence_avg,
-            MAX(tracker_id) AS tracker_id
+            MAX(tracker_id) AS tracker_id,
+            created_by_user_id
         FROM billboards
         WHERE id IN ({','.join(['%s']*len(billboard_ids))})
         GROUP BY video_id
@@ -156,14 +183,14 @@ def insert_video_data(output_file_path, filename, zone_id, state_id, city_id, cr
     query_db(video_query, video_args, False, True)
     return video_id
 
-def insert_billboard_data(video_id, billboard_data):
+def insert_billboard_data(video_id, user_id, billboard_data):
     for tracker_id, data in billboard_data.items():
 
         bill_id = generate_uuid();
         billboard_query = """
             INSERT INTO billboards (id, video_id, visibility_duration, distance_to_center, central_duration, near_p_duration, mid_p_duration, far_p_duration, 
-                                    central_distance, near_p_distance, mid_p_distance, far_p_distance, average_areas, confidence, tracker_id)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                                    central_distance, near_p_distance, mid_p_distance, far_p_distance, average_areas, confidence, tracker_id, created_by_user_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """
         billboard_args = (
             bill_id,
@@ -180,6 +207,7 @@ def insert_billboard_data(video_id, billboard_data):
             data['BillBoard_Region_Duration and Distance']['Far P Dist'],
             data['Average Areas'],
             data['Confidence'],
-            tracker_id
+            tracker_id,
+            user_id
         )
         query_db(billboard_query, billboard_args, False, True)
