@@ -1,5 +1,6 @@
 Werkzeug
 Flask
+flask-socketio
 PyJWT
 mysql-connector-python
 python-dotenv
