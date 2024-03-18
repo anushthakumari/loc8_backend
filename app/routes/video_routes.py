@@ -7,10 +7,20 @@ from scripts.video_processing_script import video_processing
 from app.utils.db_helper import query_db
 from app.utils.helpers import generate_uuid
 from app.constants.roles import roles
+from app import socketio
+from flask_socketio import emit
 
 video_bp = Blueprint('videos', __name__)
 
 TARGET_VIDEO_PATH = f"./instance/"
+
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
 
 @video_bp.route('/uploads/<filename>')
 def stream_video(filename):
@@ -82,7 +92,10 @@ def upload(current_user):
 
     video_file.save(dest)
 
-    vcd = video_processing(dest, output_file_path)
+    def progress_callback(progress_percentage):
+        socketio.emit('processing_progress', {'percentage': progress_percentage})
+
+    vcd = video_processing(dest, output_file_path, progress_callback)
     vcd2 = str(vcd)
     vcd3 = vcd2[0:2]
 
@@ -98,6 +111,7 @@ def upload(current_user):
     os.remove(dest)
 
     return jsonify({"billboards":  billboards, "video_details": video_details}), 200
+    # return jsonify({"billboards":  "", "video_details": ""}), 200
 
 
 @video_bp.route('/output/<video_id>', methods=['GET',])

@@ -34,7 +34,6 @@ from supervision.tools.detections import Detections, BoxAnnotator
 from supervision.tools.line_counter import LineCounter, LineCounterAnnotator
 from typing import List
 from ultralytics import YOLO
-from moviepy.editor import VideoFileClip
 
 
 @dataclass(frozen=True)
@@ -72,11 +71,6 @@ def tracks2boxes(tracks: List[STrack]) -> np.ndarray:
         for track
         in tracks
     ], dtype=float)
-
-
-def convert_to_mp4(input_file, output_file):
-    video_clip = VideoFileClip(input_file)
-    video_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
 
 # matches our bounding boxes with predictions
 def match_detections_with_tracks(
@@ -174,7 +168,7 @@ def write_text(image, label, pos = (0,0),font=cv2.FONT_ITALIC, font_scale=1.1, t
     return text_size
 
 y_thres = 70
-def draw_bounding_boxes(File, output_file_path):
+def draw_bounding_boxes(File, output_file_path, progress_callback):
 
     TARGET_VIDEO_PATH = output_file_path
 
@@ -185,12 +179,13 @@ def draw_bounding_boxes(File, output_file_path):
     line_annotator = LineCounterAnnotator(thickness=4, text_thickness=4, text_scale=2)
 
     # Create VideoWriter object to save the modified video
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    fourcc = cv2.VideoWriter_fourcc(*'H264')
     output_video = cv2.VideoWriter(TARGET_VIDEO_PATH, fourcc, video_info.fps, (video_info.width, video_info.height))
 
     # Dictionary to store the start frame and end frame of each detected billboard
     billboard_frames = {}
     billboard_regions = {}
+    total_frames = video_info.total_frames
 
     for frame_idx, frame in enumerate(tqdm(generator, total=video_info.total_frames)):
         results = model(frame, conf=0.57)
@@ -251,10 +246,12 @@ def draw_bounding_boxes(File, output_file_path):
         # Write the modified frame to the output video
         output_video.write(frame)
 
+        # report the percentage
+        progress_percentage = int((frame_idx + 1) / total_frames * 100)
+        progress_callback(progress_percentage)
+
     # Release the VideoWriter object
     output_video.release()
-
-    convert_to_mp4(output_file_path, output_file_path)
 
     # After processing all frames, calculate the duration of visibility and distance to center for each billboard
     visibility_durations = {}
@@ -311,8 +308,8 @@ def draw_bounding_boxes(File, output_file_path):
 
 
 
-def video_processing(dest, output_file_path=f"./instance/BillBoardDetectionandCounting.mp4"):
-    vcd =draw_bounding_boxes(dest, output_file_path)
+def video_processing(dest, output_file_path=f"./instance/BillBoardDetectionandCounting.mp4", progress_callback=None):
+    vcd =draw_bounding_boxes(dest, output_file_path, progress_callback)
     print(vcd)
     return vcd
 

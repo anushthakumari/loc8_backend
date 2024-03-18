@@ -2,12 +2,15 @@ from flask import Flask
 from flask_cors import CORS
 from config.config import AppConfig
 from app.utils.db_helper import init_db
+from flask_socketio import SocketIO
+
 import os
 
 app = Flask(__name__, static_url_path="/processed_videos", static_folder="../instance")
 app.config.from_object(AppConfig)
 
 app.mysql = init_db(app) 
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 CORS(app)
 

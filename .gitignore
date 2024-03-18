@@ -3,3 +3,4 @@ __pycache__
 app/uploads
 instance/*
 .env
+best16.pt
