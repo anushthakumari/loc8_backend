@@ -31,16 +31,38 @@ def get_all_planners(current_user):
     u.first_name,
     u.last_name,
     u.email AS user_email,
+    u.employee_id,
     u.created_at,
     z.zone_name,
-    u.zone_id,
+    s.state_name,
+    c.city_name,
+    ua.zone_id,
+    ua.state_id,
+    ua.city_id,
     cu.email AS created_by_user_email
 FROM 
     users AS u 
+
+INNER JOIN 
+    user_areas as ua
+ON
+    ua.user_id = u.id
+    
 INNER JOIN 
     zones AS z 
 ON 
-    z.zone_id = u.zone_id 
+    z.zone_id = ua.zone_id 
+
+INNER JOIN 
+    states AS s 
+ON 
+    s.state_id = ua. state_id
+
+INNER JOIN 
+    cities AS c
+ON 
+    c.city_id = ua.city_id 
+
 LEFT JOIN 
     users AS cu 
 ON 
@@ -120,9 +142,19 @@ def add_user(current_user):
     
     if current_user_role_id == roles.get("PLANNER"):
         return jsonify({'message': 'You dont have access!'}), 401
+    
+    if data['zone_id'] == None or data['zone_id'] == '':
+            return jsonify({'message': 'zone Id is required!'}), 400
+
+    if data['role_id'] == roles['PLANNER']:
+        if data['state_id'] == None or data['state_id'] == '':
+            return jsonify({'message': 'State Id is required!'}), 400
+        
+        if data['city_id'] == None or data['city_id'] == '':
+            return jsonify({'message': 'city Id is required!'}), 400
 
     hashed_pass = generate_bcrypt_hash(data['password'])
-    query = "INSERT INTO users (email, password, role_id, first_name, last_name, employee_id, zone_id, created_by_user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+    query = "INSERT INTO users (email, password, role_id, first_name, last_name, employee_id, zone_id, created_by_user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
     args = (
         user_email, 
         hashed_pass,
@@ -133,9 +165,19 @@ def add_user(current_user):
         data['zone_id'],
         current_user_id
     )
-    query_db(query, args, False, True)
 
-    return jsonify({'message': 'Admin added successfully'}), 201
+    inserted_id = query_db(query, args, True, True)
+
+    if data['role_id'] == roles['PLANNER']:
+        planner_user_area_q = """
+            INSERT INTO 
+                user_areas( user_id, zone_id, state_id, city_id)
+                values (%s, %s, %s, %s)
+            """
+        
+        query_db(planner_user_area_q, (inserted_id, data['zone_id'], data['state_id'], data['city_id']), False, True)
+
+    return jsonify({'message': 'User added successfully'}), 201
 
 @admin_bp.route('/admins/<int:user_id>', methods=['DELETE'])
 @token_required
