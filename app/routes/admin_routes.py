@@ -105,6 +105,17 @@ ORDER BY
             return jsonify([])
 
         return jsonify(admins)
+    
+@admin_bp.route('/controllers', methods=['GET'])
+@token_required
+def get_all_controllers(current_user):
+    query = "SELECT id, first_name, last_name, email, employee_id, created_at, zones.zone_name, users.zone_id FROM users inner join zones on zones.zone_id=users.zone_id WHERE role_id = 3 order by created_at desc"
+    admins = query_db(query)
+
+    if not admins:
+        return jsonify([])
+
+    return jsonify(admins)
 
 
 @admin_bp.route('/admins', methods=['POST'])
