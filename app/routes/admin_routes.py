@@ -3,6 +3,7 @@ from app.utils.helpers import token_required, superadmin_required
 from app.utils.db_helper import query_db
 from app.utils.helpers import clean_and_lower, generate_bcrypt_hash
 from app.constants.roles import roles
+from app.services.users import update_planner
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -36,32 +37,27 @@ def get_all_planners(current_user):
     z.zone_name,
     s.state_name,
     c.city_name,
-    ua.zone_id,
-    ua.state_id,
-    ua.city_id,
+    u.zone_id,
+    u.state_id,
+    u.city_id,
     cu.email AS created_by_user_email
 FROM 
     users AS u 
-
-INNER JOIN 
-    user_areas as ua
-ON
-    ua.user_id = u.id
     
 INNER JOIN 
     zones AS z 
 ON 
-    z.zone_id = ua.zone_id 
+    z.zone_id = u.zone_id 
 
 INNER JOIN 
     states AS s 
 ON 
-    s.state_id = ua. state_id
+    s.state_id = u.state_id
 
 INNER JOIN 
     cities AS c
 ON 
-    c.city_id = ua.city_id 
+    c.city_id = u.city_id 
 
 LEFT JOIN 
     users AS cu 
@@ -215,70 +211,70 @@ def delete_user(current_user,user_id):
     return jsonify({'message': 'You dont have access!'}), 400
 
 
-
 @admin_bp.route('/admins/<int:user_id>', methods=['PUT'])
 @token_required
 def update_user(current_user, user_id):
     try:
         data = request.get_json()
 
-        user = query_db("SELECT * FROM users WHERE id = %s", (user_id,), one=True)
-        if user is None:
-            return jsonify({'error': 'User not found'}), 404
-
-        if data['password'] == None or data['password'] == "":
-            query = """
-                UPDATE users 
-                SET 
-                    email = %s, 
-                    role_id = %s, 
-                    first_name = %s, 
-                    last_name = %s, 
-                    employee_id = %s, 
-                    zone_id = %s 
-                WHERE 
-                    id = %s
-            """
-            args = (
-                clean_and_lower(data['email']), 
-                data['role_id'], 
-                clean_and_lower(data.get('first_name')), 
-                clean_and_lower(data.get('last_name')), 
-                clean_and_lower(data.get('emp_id')), 
-                data['zone_id'], 
-                user_id
-            )
-            query_db(query, args, False, True)
-
+        if data['role_id'] == roles.get('PLANNER'):
+            update_planner(data, user_id)
             return jsonify({'message': 'User updated successfully'}), 200
+        
         else:
+            user = query_db("SELECT * FROM users WHERE id = %s", (user_id,), one=True)
+            if user is None:
+                return jsonify({'error': 'User not found'}), 404
 
-            hashed_pass = generate_bcrypt_hash(data['password'])
-            query = """
-                UPDATE users 
-                SET 
-                    email = %s, 
-                    role_id = %s, 
-                    first_name = %s, 
-                    last_name = %s, 
-                    employee_id = %s, 
-                    zone_id = %s,
-                    password = %s
-                WHERE 
-                    id = %s
-            """
-            args = (
-                clean_and_lower(data['email']), 
-                data['role_id'], 
-                clean_and_lower(data.get('first_name')), 
-                clean_and_lower(data.get('last_name')), 
-                clean_and_lower(data.get('emp_id')), 
-                data['zone_id'], 
-                hashed_pass,
-                user_id
-            )
-            query_db(query, args, False, True)
+            if data['password'] == None or data['password'] == "":
+                query = """
+                    UPDATE users 
+                    SET 
+                        email = %s, 
+                        first_name = %s, 
+                        last_name = %s, 
+                        employee_id = %s, 
+                        zone_id = %s 
+                    WHERE 
+                        id = %s
+                """
+                args = (
+                    clean_and_lower(data['email']),  
+                    clean_and_lower(data.get('first_name')), 
+                    clean_and_lower(data.get('last_name')), 
+                    clean_and_lower(data.get('emp_id')), 
+                    data['zone_id'], 
+                    user_id
+                )
+                query_db(query, args, False, True)
 
-            return jsonify({'message': 'User updated successfully'}), 200
+                return jsonify({'message': 'User updated successfully'}), 200
+            else:
+
+                hashed_pass = generate_bcrypt_hash(data['password'])
+                query = """
+                    UPDATE users 
+                    SET 
+                        email = %s, 
+                        first_name = %s, 
+                        last_name = %s, 
+                        employee_id = %s, 
+                        zone_id = %s,
+                        password = %s
+                    WHERE 
+                        id = %s
+                """
+                args = (
+                    clean_and_lower(data['email']), 
+                    clean_and_lower(data.get('first_name')), 
+                    clean_and_lower(data.get('last_name')), 
+                    clean_and_lower(data.get('emp_id')), 
+                    data['zone_id'], 
+                    hashed_pass,
+                    user_id
+                )
+                query_db(query, args, False, True)
+
+                return jsonify({'message': 'User updated successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
