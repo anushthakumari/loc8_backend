@@ -4,10 +4,9 @@ from werkzeug.utils import secure_filename
 import os
 import json
 
-from app.utils.helpers import generate_jwt_token
 from app.utils.db_helper import query_db
 from app.utils.helpers import token_required, generate_uuid, clean_and_lower
-from app.services.briefs import get_brief_details_by_brief_id
+from app.services.briefs import get_brief_details_by_brief_id, assign_brief_to_planners
 from app.constants.roles import roles
 
 brief_bp = Blueprint('brief', __name__)
@@ -103,12 +102,14 @@ def createBrief(current_user):
             query_db(budget_insert_q, (budget_id, brief_id, zone_id, state_id, city_id, budget_amt))
         
         current_app.mysql.connection.commit()
+
+        assign_brief_to_planners(brief_id)
+        
         return jsonify({'message': 'Created successfully'}), 201
     except Exception as e:
         current_app.mysql.connection.rollback()
         print(e)
         return jsonify({'message': 'Something went wrong!'}), 500
-
 
 @brief_bp.route('/briefs', methods=['GET'])
 @token_required
@@ -116,16 +117,34 @@ def getBriefs(current_user):
     try:
         user_id = current_user['id']
 
-        query = """
+        query = ""
+        args = ()
+
+        if current_user['role_id'] == roles.get("SUPERADMIN"):
+            query = """
             SELECT b.*, bb.budget_id, bb.zone_id, bb.state_id, bb.city_id, zones.zone_name, states.state_name, cities.city_name, bb.budget
             FROM briefs b
             INNER JOIN brief_budgets bb ON b.brief_id = bb.brief_id
             INNER JOIN zones ON bb.zone_id = zones.zone_id
             INNER JOIN states ON bb.state_id = states.state_id
             INNER JOIN cities ON bb.city_id = cities.city_id
-            WHERE b.created_by_user_id = %s
         """
-        briefs_with_budgets = query_db(query, (user_id,))
+            
+        else:
+
+            query = """
+                SELECT b.*, bb.budget_id, bb.zone_id, bb.state_id, bb.city_id, zones.zone_name, states.state_name, cities.city_name, bb.budget
+                FROM briefs b
+                INNER JOIN brief_budgets bb ON b.brief_id = bb.brief_id
+                INNER JOIN zones ON bb.zone_id = zones.zone_id
+                INNER JOIN states ON bb.state_id = states.state_id
+                INNER JOIN cities ON bb.city_id = cities.city_id
+                WHERE b.created_by_user_id = %s
+            """
+
+            args = (user_id,)
+            
+        briefs_with_budgets = query_db(query, args)
 
         if briefs_with_budgets == None: 
             return jsonify([]), 200
