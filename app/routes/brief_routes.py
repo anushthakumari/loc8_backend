@@ -220,11 +220,11 @@ def editBrief(current_user, brief_id):
 
     brief_data = get_brief_details_by_brief_id(brief_id)
 
-    # only admin and owner of the brief can delete 
-    if(brief_data['created_by_user_id'] != current_user['id'] and current_user['role_id'] != roles.get("SUPERADMIN")):
-        return jsonify({
-            'message': "You cannot edit this brief!",
-        }), 401
+    # # only admin and owner of the brief can delete 
+    # if(brief_data['created_by_user_id'] != current_user['id'] and current_user['role_id'] != roles.get("SUPERADMIN")):
+    #     return jsonify({
+    #         'message': "You cannot edit this brief!",
+    #     }), 401
 
     
     query = """
@@ -234,6 +234,99 @@ def editBrief(current_user, brief_id):
             INNER JOIN states ON bb.state_id = states.state_id
             INNER JOIN cities ON bb.city_id = cities.city_id
             WHERE bb.brief_id = %s
+        """
+    
+    budgets = query_db(query, (brief_id,))
+
+    brief_data["budgets"] = budgets
+
+    return jsonify(brief_data), 200
+
+
+@brief_bp.route('/planner', methods=['GET'])
+@token_required
+def getPlannerBriefs(current_user):
+    user_id = current_user['id']
+
+    assigned_brief_q = """
+        SELECT b.*, bb.budget_id, bb.zone_id, bb.state_id, bb.city_id, zones.zone_name, states.state_name, cities.city_name, bb.budget FROM assigned_budgets ab
+        INNER JOIN brief_budgets bb ON ab.budget_id = bb.budget_id
+        INNER JOIN briefs b ON b.brief_id=bb.brief_id
+        INNER JOIN zones ON bb.zone_id = zones.zone_id
+        INNER JOIN states ON bb.state_id = states.state_id
+        INNER JOIN cities ON bb.city_id = cities.city_id
+        WHERE 
+            ab.user_id=%s
+    """
+    assigned_brief_args = (user_id,)
+
+    briefs_with_budgets = query_db(assigned_brief_q, assigned_brief_args)
+
+    if briefs_with_budgets == None: 
+        return jsonify([]), 200
+
+    briefs_data = {}
+
+    for row in briefs_with_budgets:
+        brief_id = row['brief_id']
+        if brief_id not in briefs_data:
+            briefs_data[brief_id] = {
+                'brief_id': brief_id,
+                'category': row['category'],
+                'brand_name': row['brand_name'],
+                'brand_logo': row['brand_logo'],
+                'campaign_obj': row['campaign_obj'],
+                'start_date': row['start_date'],
+                'status': row['status'],
+                'budgets': []
+            }
+        if row['budget_id'] is not None:
+            budget_data = {
+                'budget_id': row['budget_id'],
+                'zone_id': row['zone_id'],
+                'state_id': row['state_id'],
+                'city_id': row['city_id'],
+                'zone_name': row['zone_name'],
+                'state_name': row['state_name'],
+                'city_name': row['city_name'],
+                'budget': row['budget']
+            }
+            briefs_data[brief_id]['budgets'].append(budget_data)
+
+    briefs_list = list(briefs_data.values())
+
+    return jsonify(briefs_list), 200
+
+@brief_bp.route('/budgets/<budget_id>', methods=['GET'])
+@token_required
+def getBriefBudgetDetailsByBudgetId(current_user, budget_id):
+
+    query = """
+            SELECT bb.budget_id, bb.zone_id, bb.state_id, bb.city_id, zones.zone_name, states.state_name, cities.city_name, bb.budget FROM assigned_budgets ab
+            INNER JOIN brief_budgets bb ON ab.budget_id = bb.budget_id
+            INNER JOIN zones ON bb.zone_id = zones.zone_id
+            INNER JOIN states ON bb.state_id = states.state_id
+            INNER JOIN cities ON bb.city_id = cities.city_id
+            WHERE ab.budget_id=%s
+        """
+    
+    budgets = query_db(query, (budget_id,), True)
+
+    return jsonify(budgets), 200
+
+@brief_bp.route('/briefs/<brief_id>/planner', methods=['GET'])
+@token_required
+def getBriefDetailsForPlanner(current_user, brief_id):
+
+    brief_data = get_brief_details_by_brief_id(brief_id)
+    
+    query = """
+            SELECT bb.budget_id, bb.zone_id, bb.state_id, bb.city_id, zones.zone_name, states.state_name, cities.city_name, bb.budget FROM assigned_budgets ab
+            INNER JOIN brief_budgets bb ON ab.budget_id = bb.budget_id
+            INNER JOIN zones ON bb.zone_id = zones.zone_id
+            INNER JOIN states ON bb.state_id = states.state_id
+            INNER JOIN cities ON bb.city_id = cities.city_id
+            WHERE bb.brief_id=%s
         """
     
     budgets = query_db(query, (brief_id,))

@@ -1,5 +1,5 @@
 from app.utils.db_helper import query_db
-from app.utils.helpers import clean_and_lower
+from app.utils.helpers import clean_and_lower, generate_uuid
 
 def get_brief_details_by_brief_id (brief_id=""):
    q = """
@@ -37,21 +37,23 @@ def assign_brief_to_planners(brief_id=""):
 
         for planner in planners:
             assigned_user_q = """
-                SELECT user_id FROM assigned_briefs WHERE brief_id=%s AND user_id=%s 
+                SELECT user_id FROM assigned_budgets WHERE budget_id=%s AND user_id=%s 
             """ 
 
-            assigned_user = query_db(assigned_user_q, (brief_id, planner['id']))
+            assigned_user = query_db(assigned_user_q, (budget['budget_id'], planner['id']))
 
             if assigned_user != None:
                 continue
 
+            id = generate_uuid()
+
             insert_assign_q = """
-                INSERT INTO `assigned_briefs`
-                    (`id`, `user_id`, `brief_id`) 
+                INSERT INTO `assigned_budgets`
+                    (`id`, `user_id`, `budget_id`) 
                 VALUES 
                     (%s, %s, %s)
             """
-            query_db(insert_assign_q, (brief_id, planner['id'], brief_id), False, True)
+            query_db(insert_assign_q, (id, planner['id'], budget['budget_id']), False, True)
 
 
 

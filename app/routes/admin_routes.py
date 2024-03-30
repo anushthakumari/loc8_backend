@@ -175,14 +175,14 @@ def add_user(current_user):
 
     inserted_id = query_db(query, args, True, True)
 
-    if data['role_id'] == roles['PLANNER']:
-        planner_user_area_q = """
-            INSERT INTO 
-                user_areas( user_id, zone_id, state_id, city_id)
-                values (%s, %s, %s, %s)
-            """
+    # if data['role_id'] == roles['PLANNER']:
+    #     planner_user_area_q = """
+    #         INSERT INTO 
+    #             user_areas( user_id, zone_id, state_id, city_id)
+    #             values (%s, %s, %s, %s)
+    #         """
         
-        query_db(planner_user_area_q, (inserted_id, data['zone_id'], data['state_id'], data['city_id']), False, True)
+    #     query_db(planner_user_area_q, (inserted_id, data['zone_id'], data['state_id'], data['city_id']), False, True)
 
     return jsonify({'message': 'User added successfully'}), 201
 

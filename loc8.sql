@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 18, 2024 at 05:47 PM
+-- Generation Time: Mar 30, 2024 at 09:00 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -20,6 +20,25 @@ SET time_zone = "+00:00";
 --
 -- Database: `loc8`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `assigned_budgets`
+--
+
+CREATE TABLE `assigned_budgets` (
+  `id` varchar(100) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `budget_id` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `assigned_budgets`
+--
+
+INSERT INTO `assigned_budgets` (`id`, `user_id`, `budget_id`) VALUES
+('21dff05c-009e-4016-a4eb-fe82062f561d', 29, 'bafca95f-bc99-44c3-bbeb-138570dbe71b');
 
 -- --------------------------------------------------------
 
@@ -62,6 +81,60 @@ INSERT INTO `billboards` (`id`, `video_id`, `visibility_duration`, `distance_to_
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `briefs`
+--
+
+CREATE TABLE `briefs` (
+  `brief_id` varchar(100) NOT NULL,
+  `category` varchar(200) NOT NULL,
+  `brand_name` varchar(200) NOT NULL,
+  `brand_logo` varchar(300) NOT NULL,
+  `target_audience` varchar(150) NOT NULL,
+  `campaign_obj` varchar(200) NOT NULL,
+  `media_approach` varchar(200) NOT NULL,
+  `is_immediate_camp` tinyint(1) NOT NULL DEFAULT 0,
+  `start_date` date DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `status` int(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by_user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `briefs`
+--
+
+INSERT INTO `briefs` (`brief_id`, `category`, `brand_name`, `brand_logo`, `target_audience`, `campaign_obj`, `media_approach`, `is_immediate_camp`, `start_date`, `notes`, `status`, `created_at`, `created_by_user_id`) VALUES
+('49e8478a-0fff-43a8-9835-1bd5bc3f29a1', 'category', 'brand', '49e8478a-0fff-43a8-9835-1bd5bc3f29a1Logo1.png', 'target', 'camo', 'med', 0, NULL, NULL, 0, '2024-03-26 17:53:55', 1),
+('5434544c-3308-407a-ae0c-c5c6aa6efb1b', 'car', 'brand', '5434544c-3308-407a-ae0c-c5c6aa6efb1bloan-1.jpg', '23-male', 'camp', 'med', 0, NULL, NULL, 0, '2024-03-30 06:36:36', 31);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `brief_budgets`
+--
+
+CREATE TABLE `brief_budgets` (
+  `budget_id` varchar(100) NOT NULL,
+  `brief_id` varchar(100) NOT NULL,
+  `zone_id` int(11) NOT NULL,
+  `state_id` int(11) NOT NULL,
+  `city_id` int(11) NOT NULL,
+  `budget` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `brief_budgets`
+--
+
+INSERT INTO `brief_budgets` (`budget_id`, `brief_id`, `zone_id`, `state_id`, `city_id`, `budget`) VALUES
+('3f6a5ba5-af5b-40d0-8d85-9b2b6c9ba306', '5434544c-3308-407a-ae0c-c5c6aa6efb1b', 2, 10, 7, 8000),
+('89b83f87-e27a-4982-bc23-a107475192fb', '49e8478a-0fff-43a8-9835-1bd5bc3f29a1', 5, 9, 6, 8000),
+('bafca95f-bc99-44c3-bbeb-138570dbe71b', '5434544c-3308-407a-ae0c-c5c6aa6efb1b', 5, 9, 6, 5000);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `cities`
 --
 
@@ -76,7 +149,8 @@ CREATE TABLE `cities` (
 --
 
 INSERT INTO `cities` (`city_id`, `city_name`, `state_id`) VALUES
-(6, 'new york city', 9);
+(6, 'new york city', 9),
+(7, 'south city', 10);
 
 -- --------------------------------------------------------
 
@@ -96,7 +170,8 @@ CREATE TABLE `roles` (
 INSERT INTO `roles` (`id`, `name`) VALUES
 (1, 'planner'),
 (2, 'admin'),
-(3, 'superadmin');
+(3, 'controller'),
+(4, 'superadmin');
 
 -- --------------------------------------------------------
 
@@ -115,7 +190,8 @@ CREATE TABLE `states` (
 --
 
 INSERT INTO `states` (`state_id`, `state_name`, `zone_id`) VALUES
-(9, 'new york state', 5);
+(9, 'new york state', 5),
+(10, 'south state', 2);
 
 -- --------------------------------------------------------
 
@@ -134,20 +210,24 @@ CREATE TABLE `users` (
   `zone_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `created_by_user_id` int(11) NOT NULL
+  `created_by_user_id` int(11) NOT NULL,
+  `state_id` int(11) DEFAULT NULL,
+  `city_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `email`, `password`, `role_id`, `first_name`, `last_name`, `employee_id`, `zone_id`, `created_at`, `updated_at`, `created_by_user_id`) VALUES
-(1, 'john@mail.com', '$2b$12$LGEvisGVlhfcCOF0R3KGD.EJNP4TZOyCv89zgHkbrC3Ucb5aO6x76', 3, 'John', 'Doe', '12345', 1, '2024-03-06 18:00:33', '2024-03-08 04:40:24', 0),
-(9, 'anushthakumari12345@gmail.com', '$2b$12$qe2C.Rdodi2pDi3xxQeiGOe8GxQdg0ERQQtYh9oPQr1oDFXq84qE.', 1, 'anushtha', 'pandit', '89562', 1, '2024-03-10 13:40:31', '2024-03-10 13:40:31', 0),
-(13, 'admin@mail.com', '$2b$12$7yfRX7.kLFAtOD7nvpIj7u76YbB20irAqQmTUpYV.8zYhccohU2sq', 2, 'user', 'admin', '123456', 1, '2024-03-17 14:28:39', '2024-03-17 14:28:39', 0),
-(14, 'yo@mail.com', '$2b$12$rIJIEx7XSbKVubj4q5W32uiVP9pbFRs4vjz8RI7rJ1cMiXKai5VHa', 2, 'new', 'admin', '1234565', 2, '2024-03-17 14:40:42', '2024-03-17 14:40:42', 0),
-(19, 'planner@admin.com', '$2b$12$vsqf/Nc77zLxi8Lpo83BH.T.8Q.oaJ11xRqfEltw8GIOnATIJ//Oe', 1, 'planner', 'admin', '78952', 1, '2024-03-17 15:52:29', '2024-03-17 15:52:29', 13),
-(20, 'yeys@mail.com', '$2b$12$euK6VANjCvqQNCC3C4rEaO66x1mZ4STi6ZtGFgz4eUGsKYtGzVFpS', 2, 'yesy', 'yesy', '798465', 3, '2024-03-17 17:45:31', '2024-03-18 14:56:32', 1);
+INSERT INTO `users` (`id`, `email`, `password`, `role_id`, `first_name`, `last_name`, `employee_id`, `zone_id`, `created_at`, `updated_at`, `created_by_user_id`, `state_id`, `city_id`) VALUES
+(1, 'john@mail.com', '$2b$12$LGEvisGVlhfcCOF0R3KGD.EJNP4TZOyCv89zgHkbrC3Ucb5aO6x76', 4, 'John', 'Doe', '12345', 1, '2024-03-06 18:00:33', '2024-03-20 15:38:18', 0, NULL, NULL),
+(13, 'admin@mail.com', '$2b$12$7yfRX7.kLFAtOD7nvpIj7u76YbB20irAqQmTUpYV.8zYhccohU2sq', 2, 'user', 'admin', '123456', 1, '2024-03-17 14:28:39', '2024-03-17 14:28:39', 0, NULL, NULL),
+(14, 'yo@mail.com', '$2b$12$rIJIEx7XSbKVubj4q5W32uiVP9pbFRs4vjz8RI7rJ1cMiXKai5VHa', 2, 'new', 'admin', '1234565', 2, '2024-03-17 14:40:42', '2024-03-17 14:40:42', 0, NULL, NULL),
+(19, 'planner@admin.com', '$2b$12$vsqf/Nc77zLxi8Lpo83BH.T.8Q.oaJ11xRqfEltw8GIOnATIJ//Oe', 1, 'planner', 'admin', '78952', 1, '2024-03-17 15:52:29', '2024-03-17 15:52:29', 13, NULL, NULL),
+(20, 'yeys@mail.com', '$2b$12$euK6VANjCvqQNCC3C4rEaO66x1mZ4STi6ZtGFgz4eUGsKYtGzVFpS', 2, 'yesy', 'yesy', '798465', 1, '2024-03-17 17:45:31', '2024-03-23 12:10:39', 1, NULL, NULL),
+(29, 'ref@mail.com', '$2b$12$nH2hImpap6vdJV6jyCsTSOULk97PuuIoPrUXNGZ2DCNvziO2aVoeK', 1, 'rem', 'rem', 'ty79845', 5, '2024-03-21 17:53:07', '2024-03-23 11:52:15', 1, 9, 6),
+(31, 'controller1@mail.com', '$2b$12$0Y1ZorF5R/EaOzA5J7uAr.yZ4mvi8WPFJvvwnjMZ2TzGTuF4Pf3kW', 3, 'controller', 'user', 'control1', 1, '2024-03-23 12:50:08', '2024-03-23 12:50:08', 1, NULL, NULL),
+(32, 'testplanner@mail.com', '$2b$12$dpTVjq6VPeNqqeqBVq1cB.tG41XjySZr0uXst5zmEcHkxGtHfMTnO', 1, 'test', 'test', 'test12', 5, '2024-03-26 18:46:39', '2024-03-26 18:46:39', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -201,12 +281,37 @@ INSERT INTO `zones` (`zone_id`, `zone_name`) VALUES
 --
 
 --
+-- Indexes for table `assigned_budgets`
+--
+ALTER TABLE `assigned_budgets`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `budget_id` (`budget_id`);
+
+--
 -- Indexes for table `billboards`
 --
 ALTER TABLE `billboards`
   ADD PRIMARY KEY (`id`),
   ADD KEY `video_id` (`video_id`),
   ADD KEY `fk_created_by_user_bill` (`created_by_user_id`);
+
+--
+-- Indexes for table `briefs`
+--
+ALTER TABLE `briefs`
+  ADD PRIMARY KEY (`brief_id`),
+  ADD KEY `created_by_user_id` (`created_by_user_id`);
+
+--
+-- Indexes for table `brief_budgets`
+--
+ALTER TABLE `brief_budgets`
+  ADD PRIMARY KEY (`budget_id`),
+  ADD KEY `brief_id` (`brief_id`),
+  ADD KEY `city_id` (`city_id`),
+  ADD KEY `state_id` (`state_id`),
+  ADD KEY `zone_id` (`zone_id`);
 
 --
 -- Indexes for table `cities`
@@ -238,7 +343,9 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `email` (`email`,`employee_id`),
   ADD UNIQUE KEY `unique_email` (`email`),
   ADD UNIQUE KEY `unique_epmloyee_id` (`employee_id`),
-  ADD KEY `role_id` (`role_id`);
+  ADD KEY `role_id` (`role_id`),
+  ADD KEY `fk_user_sate` (`state_id`),
+  ADD KEY `fk_user_city` (`city_id`);
 
 --
 -- Indexes for table `videofiles`
@@ -265,25 +372,25 @@ ALTER TABLE `zones`
 -- AUTO_INCREMENT for table `cities`
 --
 ALTER TABLE `cities`
-  MODIFY `city_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `city_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `states`
 --
 ALTER TABLE `states`
-  MODIFY `state_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `state_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `zones`
@@ -296,11 +403,33 @@ ALTER TABLE `zones`
 --
 
 --
+-- Constraints for table `assigned_budgets`
+--
+ALTER TABLE `assigned_budgets`
+  ADD CONSTRAINT `assigned_budgets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `assigned_budgets_ibfk_2` FOREIGN KEY (`budget_id`) REFERENCES `brief_budgets` (`budget_id`);
+
+--
 -- Constraints for table `billboards`
 --
 ALTER TABLE `billboards`
   ADD CONSTRAINT `billboards_ibfk_1` FOREIGN KEY (`video_id`) REFERENCES `videofiles` (`video_id`),
   ADD CONSTRAINT `fk_created_by_user_bill` FOREIGN KEY (`created_by_user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `briefs`
+--
+ALTER TABLE `briefs`
+  ADD CONSTRAINT `briefs_ibfk_1` FOREIGN KEY (`created_by_user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `brief_budgets`
+--
+ALTER TABLE `brief_budgets`
+  ADD CONSTRAINT `brief_budgets_ibfk_1` FOREIGN KEY (`brief_id`) REFERENCES `briefs` (`brief_id`),
+  ADD CONSTRAINT `brief_budgets_ibfk_2` FOREIGN KEY (`city_id`) REFERENCES `cities` (`city_id`),
+  ADD CONSTRAINT `brief_budgets_ibfk_3` FOREIGN KEY (`state_id`) REFERENCES `states` (`state_id`),
+  ADD CONSTRAINT `brief_budgets_ibfk_4` FOREIGN KEY (`zone_id`) REFERENCES `zones` (`zone_id`);
 
 --
 -- Constraints for table `cities`
@@ -318,6 +447,8 @@ ALTER TABLE `states`
 -- Constraints for table `users`
 --
 ALTER TABLE `users`
+  ADD CONSTRAINT `fk_user_city` FOREIGN KEY (`city_id`) REFERENCES `cities` (`city_id`),
+  ADD CONSTRAINT `fk_user_sate` FOREIGN KEY (`state_id`) REFERENCES `states` (`state_id`),
   ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`);
 
 --
