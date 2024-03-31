@@ -5,6 +5,8 @@ from flask import request, jsonify, current_app
 from bcrypt import hashpw, gensalt
 import uuid
 
+from app.constants.roles import roles
+
 def generate_uuid():
     return str(uuid.uuid4())
 
@@ -49,10 +51,10 @@ def superadmin_required(func):
     def wrapper(*args, **kwargs):
         current_user = kwargs.get('current_user')
 
-        if not current_user or current_user.get('role_id') != 3:
+        if not current_user or current_user.get('role_id') != roles.get("SUPERADMIN"):
             return jsonify({'message': 'Access denied. Superadmin privileges required.'}), 403
 
-        return func(current_user=current_user, *args, **kwargs)
+        return func(*args, **kwargs)
 
     return wrapper
 

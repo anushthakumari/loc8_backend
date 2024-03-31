@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 30, 2024 at 09:00 AM
+-- Generation Time: Mar 31, 2024 at 08:49 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -33,13 +33,6 @@ CREATE TABLE `assigned_budgets` (
   `budget_id` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `assigned_budgets`
---
-
-INSERT INTO `assigned_budgets` (`id`, `user_id`, `budget_id`) VALUES
-('21dff05c-009e-4016-a4eb-fe82062f561d', 29, 'bafca95f-bc99-44c3-bbeb-138570dbe71b');
-
 -- --------------------------------------------------------
 
 --
@@ -66,18 +59,6 @@ CREATE TABLE `billboards` (
   `created_by_user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `billboards`
---
-
-INSERT INTO `billboards` (`id`, `video_id`, `visibility_duration`, `distance_to_center`, `central_duration`, `near_p_duration`, `mid_p_duration`, `far_p_duration`, `central_distance`, `near_p_distance`, `mid_p_distance`, `far_p_distance`, `average_areas`, `confidence`, `tracker_id`, `created_at`, `created_by_user_id`) VALUES
-('2de1a75f-c768-4989-810c-c92fc8a45583', '1c7f09c5-74b6-40a9-893d-93c5fd643340', 3.83333, 37.7746, 0.233333, 3.13333, 0.466667, 0, 60.0628, 126.889, 72.5264, 0, 1.40527, 0.707758, 4, '2024-03-18 16:22:03', 1),
-('517f80e7-a2ed-45f4-8f12-00b6227aad54', 'a3634162-fad6-41ff-8f96-1b415758d662', 3.83333, 37.7746, 0.233333, 3.13333, 0.466667, 0, 60.0628, 126.889, 72.5264, 0, 1.40527, 0.707758, 8, '2024-03-18 16:27:08', 1),
-('8ec11a15-acfa-4dc4-9651-a188002e7c4a', '1c7f09c5-74b6-40a9-893d-93c5fd643340', 4.36667, 42.2614, 0, 1.83333, 1.56667, 0.766667, 0, 66.924, 75.9757, 87.507, 2.39415, 0.706747, 2, '2024-03-18 16:21:45', 1),
-('96f5b5ab-b45b-480e-bc8d-b0705ff390bf', 'a3634162-fad6-41ff-8f96-1b415758d662', 2, 42.2873, 0, 0, 0.966667, 1.03333, 0, 0, 77.9903, 86.8466, 3.0619, 0.670036, 5, '2024-03-18 16:26:57', 1),
-('a24e102d-dc0d-46a0-96a2-26ff9ed98b7c', 'a3634162-fad6-41ff-8f96-1b415758d662', 4.36667, 42.2614, 0, 1.83333, 1.56667, 0.766667, 0, 66.924, 75.9757, 87.507, 2.39415, 0.706747, 6, '2024-03-18 16:26:57', 1),
-('fcb482ca-ae0b-4404-8e2e-5ab9b69225ae', '1c7f09c5-74b6-40a9-893d-93c5fd643340', 2, 42.2873, 0, 0, 0.966667, 1.03333, 0, 0, 77.9903, 86.8466, 3.0619, 0.670036, 1, '2024-03-18 16:21:45', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -100,14 +81,6 @@ CREATE TABLE `briefs` (
   `created_by_user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `briefs`
---
-
-INSERT INTO `briefs` (`brief_id`, `category`, `brand_name`, `brand_logo`, `target_audience`, `campaign_obj`, `media_approach`, `is_immediate_camp`, `start_date`, `notes`, `status`, `created_at`, `created_by_user_id`) VALUES
-('49e8478a-0fff-43a8-9835-1bd5bc3f29a1', 'category', 'brand', '49e8478a-0fff-43a8-9835-1bd5bc3f29a1Logo1.png', 'target', 'camo', 'med', 0, NULL, NULL, 0, '2024-03-26 17:53:55', 1),
-('5434544c-3308-407a-ae0c-c5c6aa6efb1b', 'car', 'brand', '5434544c-3308-407a-ae0c-c5c6aa6efb1bloan-1.jpg', '23-male', 'camp', 'med', 0, NULL, NULL, 0, '2024-03-30 06:36:36', 31);
-
 -- --------------------------------------------------------
 
 --
@@ -122,15 +95,6 @@ CREATE TABLE `brief_budgets` (
   `city_id` int(11) NOT NULL,
   `budget` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `brief_budgets`
---
-
-INSERT INTO `brief_budgets` (`budget_id`, `brief_id`, `zone_id`, `state_id`, `city_id`, `budget`) VALUES
-('3f6a5ba5-af5b-40d0-8d85-9b2b6c9ba306', '5434544c-3308-407a-ae0c-c5c6aa6efb1b', 2, 10, 7, 8000),
-('89b83f87-e27a-4982-bc23-a107475192fb', '49e8478a-0fff-43a8-9835-1bd5bc3f29a1', 5, 9, 6, 8000),
-('bafca95f-bc99-44c3-bbeb-138570dbe71b', '5434544c-3308-407a-ae0c-c5c6aa6efb1b', 5, 9, 6, 5000);
 
 -- --------------------------------------------------------
 
@@ -207,27 +171,39 @@ CREATE TABLE `users` (
   `first_name` varchar(100) NOT NULL,
   `last_name` varchar(100) DEFAULT NULL,
   `employee_id` varchar(20) NOT NULL,
-  `zone_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `created_by_user_id` int(11) NOT NULL,
-  `state_id` int(11) DEFAULT NULL,
-  `city_id` int(11) DEFAULT NULL
+  `created_by_user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `email`, `password`, `role_id`, `first_name`, `last_name`, `employee_id`, `zone_id`, `created_at`, `updated_at`, `created_by_user_id`, `state_id`, `city_id`) VALUES
-(1, 'john@mail.com', '$2b$12$LGEvisGVlhfcCOF0R3KGD.EJNP4TZOyCv89zgHkbrC3Ucb5aO6x76', 4, 'John', 'Doe', '12345', 1, '2024-03-06 18:00:33', '2024-03-20 15:38:18', 0, NULL, NULL),
-(13, 'admin@mail.com', '$2b$12$7yfRX7.kLFAtOD7nvpIj7u76YbB20irAqQmTUpYV.8zYhccohU2sq', 2, 'user', 'admin', '123456', 1, '2024-03-17 14:28:39', '2024-03-17 14:28:39', 0, NULL, NULL),
-(14, 'yo@mail.com', '$2b$12$rIJIEx7XSbKVubj4q5W32uiVP9pbFRs4vjz8RI7rJ1cMiXKai5VHa', 2, 'new', 'admin', '1234565', 2, '2024-03-17 14:40:42', '2024-03-17 14:40:42', 0, NULL, NULL),
-(19, 'planner@admin.com', '$2b$12$vsqf/Nc77zLxi8Lpo83BH.T.8Q.oaJ11xRqfEltw8GIOnATIJ//Oe', 1, 'planner', 'admin', '78952', 1, '2024-03-17 15:52:29', '2024-03-17 15:52:29', 13, NULL, NULL),
-(20, 'yeys@mail.com', '$2b$12$euK6VANjCvqQNCC3C4rEaO66x1mZ4STi6ZtGFgz4eUGsKYtGzVFpS', 2, 'yesy', 'yesy', '798465', 1, '2024-03-17 17:45:31', '2024-03-23 12:10:39', 1, NULL, NULL),
-(29, 'ref@mail.com', '$2b$12$nH2hImpap6vdJV6jyCsTSOULk97PuuIoPrUXNGZ2DCNvziO2aVoeK', 1, 'rem', 'rem', 'ty79845', 5, '2024-03-21 17:53:07', '2024-03-23 11:52:15', 1, 9, 6),
-(31, 'controller1@mail.com', '$2b$12$0Y1ZorF5R/EaOzA5J7uAr.yZ4mvi8WPFJvvwnjMZ2TzGTuF4Pf3kW', 3, 'controller', 'user', 'control1', 1, '2024-03-23 12:50:08', '2024-03-23 12:50:08', 1, NULL, NULL),
-(32, 'testplanner@mail.com', '$2b$12$dpTVjq6VPeNqqeqBVq1cB.tG41XjySZr0uXst5zmEcHkxGtHfMTnO', 1, 'test', 'test', 'test12', 5, '2024-03-26 18:46:39', '2024-03-26 18:46:39', 1, NULL, NULL);
+INSERT INTO `users` (`id`, `email`, `password`, `role_id`, `first_name`, `last_name`, `employee_id`, `created_at`, `updated_at`, `created_by_user_id`) VALUES
+(1, 'john@mail.com', '$2b$12$LGEvisGVlhfcCOF0R3KGD.EJNP4TZOyCv89zgHkbrC3Ucb5aO6x76', 4, 'John', 'Doe', '12345', '2024-03-06 18:00:33', '2024-03-20 15:38:18', 0),
+(33, 'test@mail.com', '$2b$12$O7CNwBTngCzvIlPr430J6uilaOC6tKDG93C6.30DEFXMbaKNafQu6', 2, 'rem1', 'rem1', '123454', '2024-03-31 15:39:19', '2024-03-31 18:49:00', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_areas`
+--
+
+CREATE TABLE `user_areas` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `zone_id` int(11) DEFAULT NULL,
+  `state_id` int(11) DEFAULT NULL,
+  `city_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_areas`
+--
+
+INSERT INTO `user_areas` (`id`, `user_id`, `zone_id`, `state_id`, `city_id`) VALUES
+(0, 33, 2, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -245,14 +221,6 @@ CREATE TABLE `videofiles` (
   `created_by_user_id` int(11) DEFAULT NULL,
   `video_path` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `videofiles`
---
-
-INSERT INTO `videofiles` (`video_id`, `filename`, `zone_id`, `state_id`, `city_id`, `created_at`, `created_by_user_id`, `video_path`) VALUES
-('1c7f09c5-74b6-40a9-893d-93c5fd643340', '751ef1b9-4402-4ffa-9a30-8e91c3eb10b9.mp4', 5, 9, 6, '2024-03-18 16:21:45', 1, './instance/751ef1b9-4402-4ffa-9a30-8e91c3eb10b9.mp4'),
-('a3634162-fad6-41ff-8f96-1b415758d662', '12b6fe9c-73e2-4156-abb5-8e5015bc9355.mp4', 5, 9, 6, '2024-03-18 16:26:57', 1, './instance/12b6fe9c-73e2-4156-abb5-8e5015bc9355.mp4');
 
 -- --------------------------------------------------------
 
@@ -343,9 +311,17 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `email` (`email`,`employee_id`),
   ADD UNIQUE KEY `unique_email` (`email`),
   ADD UNIQUE KEY `unique_epmloyee_id` (`employee_id`),
-  ADD KEY `role_id` (`role_id`),
-  ADD KEY `fk_user_sate` (`state_id`),
-  ADD KEY `fk_user_city` (`city_id`);
+  ADD KEY `role_id` (`role_id`);
+
+--
+-- Indexes for table `user_areas`
+--
+ALTER TABLE `user_areas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `zone_id` (`zone_id`),
+  ADD KEY `state_id` (`state_id`),
+  ADD KEY `city_id` (`city_id`);
 
 --
 -- Indexes for table `videofiles`
@@ -390,7 +366,7 @@ ALTER TABLE `states`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `zones`
@@ -447,9 +423,16 @@ ALTER TABLE `states`
 -- Constraints for table `users`
 --
 ALTER TABLE `users`
-  ADD CONSTRAINT `fk_user_city` FOREIGN KEY (`city_id`) REFERENCES `cities` (`city_id`),
-  ADD CONSTRAINT `fk_user_sate` FOREIGN KEY (`state_id`) REFERENCES `states` (`state_id`),
   ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`);
+
+--
+-- Constraints for table `user_areas`
+--
+ALTER TABLE `user_areas`
+  ADD CONSTRAINT `user_areas_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `user_areas_ibfk_2` FOREIGN KEY (`zone_id`) REFERENCES `zones` (`zone_id`),
+  ADD CONSTRAINT `user_areas_ibfk_3` FOREIGN KEY (`state_id`) REFERENCES `states` (`state_id`),
+  ADD CONSTRAINT `user_areas_ibfk_4` FOREIGN KEY (`city_id`) REFERENCES `cities` (`city_id`);
 
 --
 -- Constraints for table `videofiles`
