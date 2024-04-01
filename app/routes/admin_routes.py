@@ -206,25 +206,12 @@ ORDER BY
         return jsonify(admins)
   
   
-@admin_bp.route('/controllers', methods=['GET'])
-@token_required
-def get_all_controllers(current_user):
-    query = "SELECT id, first_name, last_name, email, employee_id, created_at, zones.zone_name, users.zone_id FROM users inner join zones on zones.zone_id=users.zone_id WHERE role_id = 3 order by created_at desc"
-    admins = query_db(query)
-
-    if not admins:
-        return jsonify([])
-
-    return jsonify(admins)
-
-
 @admin_bp.route('/admins', methods=['POST'])
 @token_required
 @superadmin_required
 def add_user(current_user):
 
     current_user_id = current_user['id']
-    current_user_role_id = current_user['role_id']
 
     data = request.get_json()
     user_email = clean_and_lower(data['email'])
@@ -233,7 +220,7 @@ def add_user(current_user):
     if is_user_email_exits(user_email):
         return jsonify({'message': 'User with this email already exists!'}), 400
 
-    if is_emp_id_exits(user_emp_id) != None:
+    if is_emp_id_exits(user_emp_id):
         return jsonify({'message': 'User with this employee id already exists!'}), 400
     
     if data['zone_id'] == None or data['zone_id'] == '':
@@ -251,14 +238,14 @@ def add_user(current_user):
     args = (
         user_email, 
         hashed_pass,
-        data['role_id'], 
+        roles.get("ADMIN"), 
         clean_and_lower(data.get('first_name')), 
         clean_and_lower(data.get('last_name')), 
         user_emp_id,
         current_user_id
     )
 
-    inserted_id = query_db(query, args, True, True)
+    inserted_id = query_db(query, args, False, True)
 
     insert_user_areas(inserted_id, data['zone_id'])
 
