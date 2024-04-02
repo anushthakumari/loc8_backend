@@ -58,6 +58,18 @@ def superadmin_required(func):
 
     return wrapper
 
+def admin_required(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        current_user = kwargs.get('current_user')
+
+        if not current_user or (current_user.get('role_id') != roles.get("SUPERADMIN") and current_user.get('role_id') != roles.get("ADMIN")):
+            return jsonify({'message': 'Access denied. Superadmin privileges required.'}), 403
+
+        return func(*args, **kwargs)
+
+    return wrapper
+
 def clean_and_lower(value):
     if isinstance(value, str):
         return value.strip().lower()
