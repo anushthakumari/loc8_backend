@@ -24,7 +24,15 @@ def assign_brief_to_planners(brief_id=""):
 
    for budget in budgets:
         planner_q = """
-            SELECT id FROM users WHERE zone_id=%s AND state_id=%s AND city_id=%s AND role_id=1
+            SELECT user_areas.user_id 
+            FROM user_areas 
+            INNER JOIN users 
+                ON users.id=user_areas.user_id
+            WHERE 
+                    user_areas.zone_id=%s 
+                AND user_areas.state_id=%s 
+                AND user_areas.city_id=%s 
+                AND users.role_id=1
         """
 
         planners = query_db(planner_q, (
@@ -40,7 +48,7 @@ def assign_brief_to_planners(brief_id=""):
                 SELECT user_id FROM assigned_budgets WHERE budget_id=%s AND user_id=%s 
             """ 
 
-            assigned_user = query_db(assigned_user_q, (budget['budget_id'], planner['id']))
+            assigned_user = query_db(assigned_user_q, (budget['budget_id'], planner['user_id']))
 
             if assigned_user != None:
                 continue
@@ -53,7 +61,7 @@ def assign_brief_to_planners(brief_id=""):
                 VALUES 
                     (%s, %s, %s)
             """
-            query_db(insert_assign_q, (id, planner['id'], budget['budget_id']), False, True)
+            query_db(insert_assign_q, (id, planner['user_id'], budget['budget_id']), False, True)
 
 
 
