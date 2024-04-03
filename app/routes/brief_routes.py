@@ -310,9 +310,20 @@ def getBriefBudgetDetailsByBudgetId(current_user, budget_id):
             WHERE ab.budget_id=%s
         """
     
-    budgets = query_db(query, (budget_id,), True)
+    video_query = """
+        SELECT * FROM videofiles
+        WHERE zone_id=%s AND state_id=%s AND city_id=%s
+    """
+    
+    budget = query_db(query, (budget_id,), True)
 
-    return jsonify(budgets), 200
+    if budget == None:
+        return jsonify({}), 200
+
+
+    videos = query_db(video_query, (budget['zone_id'], budget['state_id'], budget['city_id']))
+
+    return jsonify({'budget':  budget, 'videos': videos }), 200
 
 @brief_bp.route('/briefs/<brief_id>/planner', methods=['GET'])
 @token_required
