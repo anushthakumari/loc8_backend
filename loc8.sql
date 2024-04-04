@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 03, 2024 at 08:52 PM
+-- Generation Time: Apr 04, 2024 at 09:01 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -162,8 +162,8 @@ CREATE TABLE `plans` (
   `user_id` int(11) NOT NULL,
   `video_id` varchar(40) NOT NULL,
   `location` varchar(100) NOT NULL,
-  `lattitude` decimal(9,6) NOT NULL,
-  `longititude` decimal(9,6) NOT NULL,
+  `latitude` decimal(9,6) NOT NULL,
+  `longitude` decimal(9,6) NOT NULL,
   `illumination` varchar(200) NOT NULL,
   `media_type` varchar(150) NOT NULL,
   `w` int(8) NOT NULL,
@@ -175,10 +175,17 @@ CREATE TABLE `plans` (
   `rental_per_month` decimal(10,2) NOT NULL,
   `cost_for_duration` decimal(10,2) NOT NULL,
   `printing` decimal(10,2) NOT NULL,
-  `mouting` decimal(10,2) NOT NULL,
+  `mounting` decimal(10,2) NOT NULL,
   `total` decimal(10,2) NOT NULL,
   `status` int(2) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `plans`
+--
+
+INSERT INTO `plans` (`plan_id`, `brief_id`, `budget_id`, `user_id`, `video_id`, `location`, `latitude`, `longitude`, `illumination`, `media_type`, `w`, `h`, `qty`, `size`, `duration`, `imp_per_month`, `rental_per_month`, `cost_for_duration`, `printing`, `mounting`, `total`, `status`) VALUES
+('cf88ea16-1eaf-4157-a6c7-9ad41a7f0326', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8', 'bc82c708-8725-4d66-ba36-c6e0341a88fa', 39, '9371b1e0-6542-4419-9d35-f05ecf247d40', 'test', 26.745600, 81.880400, 'illumination', 'media type', 12, 12, 12, 12, 25.00, 156, 12000.00, 10000.00, 17.00, 17.00, 10034.00, 1);
 
 -- --------------------------------------------------------
 

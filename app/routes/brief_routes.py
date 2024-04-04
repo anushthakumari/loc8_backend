@@ -301,9 +301,12 @@ def getPlannerBriefs(current_user):
 @token_required
 def getBriefBudgetDetailsByBudgetId(current_user, budget_id):
 
+    current_user_id = current_user['id']
+    
     query = """
-            SELECT bb.budget_id, bb.zone_id, bb.state_id, bb.city_id, zones.zone_name, states.state_name, cities.city_name, bb.budget FROM assigned_budgets ab
+            SELECT bb.budget_id, briefs.brief_id, bb.zone_id, bb.state_id, bb.city_id, zones.zone_name, states.state_name, cities.city_name, bb.budget FROM assigned_budgets ab
             INNER JOIN brief_budgets bb ON ab.budget_id = bb.budget_id
+            INNER JOIN briefs ON briefs.brief_id=bb.brief_id
             INNER JOIN zones ON bb.zone_id = zones.zone_id
             INNER JOIN states ON bb.state_id = states.state_id
             INNER JOIN cities ON bb.city_id = cities.city_id
@@ -315,15 +318,20 @@ def getBriefBudgetDetailsByBudgetId(current_user, budget_id):
         WHERE zone_id=%s AND state_id=%s AND city_id=%s
     """
     
+    plans_query = """
+        SELECT * FROM plans
+        WHERE budget_id=%s AND user_id=%s
+    """
+
     budget = query_db(query, (budget_id,), True)
 
     if budget == None:
         return jsonify({}), 200
 
-
+    plans = query_db(plans_query, (budget['budget_id'], current_user_id))
     videos = query_db(video_query, (budget['zone_id'], budget['state_id'], budget['city_id']))
 
-    return jsonify({'budget':  budget, 'videos': videos }), 200
+    return jsonify({'budget':  budget, 'videos': videos, 'plans': plans }), 200
 
 @brief_bp.route('/briefs/<brief_id>/planner', methods=['GET'])
 @token_required
