@@ -1,8 +1,13 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, send_file
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
 import json
+from pptx import Presentation
+from pptx.util import Inches
+from pptx.enum.shapes import MSO_SHAPE
+from pptx.dml.color import RGBColor
+from io import BytesIO
 
 from app.utils.db_helper import query_db
 from app.utils.helpers import token_required, generate_uuid, clean_and_lower
@@ -12,6 +17,8 @@ from app.constants.roles import roles
 brief_bp = Blueprint('brief', __name__)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+osmo_logo_path = "./assets/Logo1.png"
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -417,3 +424,211 @@ def finish_budget_plan(current_user, budget_id, brief_id):
 
 
     return jsonify({'message': "Plan updated!"})
+
+@brief_bp.route('/briefs/<brief_id>/download', methods=['GET'])
+@token_required
+def download_plan(current_user, brief_id):
+    
+    user_id = current_user['id']
+
+    brief_details = get_brief_details_by_brief_id(brief_id)
+
+    query = """
+        SELECT bb.*, zones.zone_name, states.state_name, cities.city_name
+        FROM brief_budgets bb
+        INNER JOIN zones ON bb.zone_id = zones.zone_id
+        INNER JOIN states ON bb.state_id = states.state_id
+        INNER JOIN cities ON bb.city_id = cities.city_id
+        WHERE bb.brief_id = %s
+    """
+
+    budgets = query_db(query, (brief_id,))
+    
+    brand_logo_path = current_app.config['UPLOAD_FOLDER'] +"/"+ brief_details['brand_logo']
+
+    prs = Presentation()
+
+    # slide dimensions for widescreen (16:9)
+    prs.slide_width = Inches(13.33)
+    prs.slide_height = Inches(7.5)
+
+    # slide with blank layout
+    blank_slide_layout = prs.slide_layouts[6]
+    intro_slide = prs.slides.add_slide(blank_slide_layout)
+
+    intro_slide = create_intro_slide(intro_slide, brand_logo_path, )
+
+    for budget in budgets:
+        area_slide = prs.slides.add_slide(blank_slide_layout)
+
+        area_slide = create_area_slide(area_slide, brand_logo_path, budget['zone_name'], budget['state_name'], budget['city_name'])
+
+        query = """
+            SELECT * FROM plans
+            WHERE budget_id=%s
+        """
+
+        plans = query_db(query, (budget['budget_id'],))
+
+        for plan in plans:
+            location  = plan['location']
+            size_text = "Size: {}×{}".format(plan['h'], plan['w'])
+
+            plan_slide = prs.slides.add_slide(blank_slide_layout)
+
+            # heading
+            title_shape = plan_slide.shapes.add_textbox(Inches(0.2), Inches(0.2), Inches(4.5), Inches(0.8))
+            title_text_frame = title_shape.text_frame
+            title_text_frame.text = "{}   {}".format(location, size_text)
+            p = title_text_frame.paragraphs[0]
+            p.font.size = Inches(0.5)
+            p.font.color.rgb = RGBColor(255, 165, 0)
+
+            title_shape.fill.solid()
+            title_shape.fill.fore_color.rgb = RGBColor(0, 0, 255)
+
+            # brand logo
+            image_path = brand_logo_path
+            left_inch = Inches(8.5)
+            top_inch = Inches(0.2)
+            width_inch = Inches(2.5)
+            height_inch = Inches(1)
+            plan_slide.shapes.add_picture(image_path, left_inch, top_inch, width_inch, height_inch)
+
+            # Add osmo logo
+            image_path = osmo_logo_path
+            left_inch = Inches(11.3)
+            top_inch = Inches(0.1)
+            width_inch = Inches(2)
+            height_inch = Inches(1)
+            plan_slide.shapes.add_picture(image_path, left_inch, top_inch, width_inch, height_inch)
+
+            site_image_path = current_app.config['UPLOAD_FOLDER'] +"/"+ plan['site_image']
+            map_image_path = current_app.config['UPLOAD_FOLDER'] +"/"+ plan['map_image']
+
+            # site image
+            left_inch = Inches(1)
+            top_inch = Inches(1.2)
+            width_inch = Inches(11)
+            height_inch = Inches(6.2)
+            plan_slide.shapes.add_picture(site_image_path, left_inch, top_inch, width_inch, height_inch)
+
+            # Map Image
+            left_inch = Inches(9)
+            top_inch = Inches(5)
+            width_inch = Inches(4.2)
+            height_inch = Inches(2.5)
+            plan_slide.shapes.add_picture(map_image_path, left_inch, top_inch, width_inch, height_inch)
+
+
+
+
+    # creating thank you slide-
+    thank_u_slide = prs.slides.add_slide(blank_slide_layout)
+
+    # add logo
+    image_path = osmo_logo_path
+    left_inch = Inches(5.5)
+    top_inch = Inches(2.5)
+    width_inch = Inches(2.5)
+    height_inch = Inches(1.5)
+    thank_u_slide.shapes.add_picture(image_path, left_inch, top_inch, width_inch, height_inch)
+
+    # add title
+    title_shape = thank_u_slide.shapes.add_textbox(Inches(4.1), Inches(4), Inches(4.5), Inches(1))
+    title_text_frame = title_shape.text_frame
+    title_text_frame.text = "Let's create something irresistible"
+    p = title_text_frame.paragraphs[0]
+    p.font.size = Inches(0.4)
+    p.font.color.rgb = RGBColor(128, 128, 128)
+
+    presentation_bytes = BytesIO()
+    prs.save(presentation_bytes)
+    presentation_bytes.seek(0)
+
+
+    return send_file(
+        presentation_bytes,
+        as_attachment=True,
+        download_name="presentation.pptx",
+        mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    )
+
+
+def create_intro_slide(intro_slide, brand_logo_path):
+    
+    # brand logo
+    image_path = brand_logo_path
+    left_inch = Inches(5.5)
+    top_inch = Inches(1.3)
+    width_inch = Inches(2.5)
+    height_inch = Inches(1.5)
+    intro_slide.shapes.add_picture(image_path, left_inch, top_inch, width_inch, height_inch)
+
+    # heading
+    title_shape = intro_slide.shapes.add_textbox(Inches(4.5), Inches(3), Inches(4.5), Inches(1))
+    title_text_frame = title_shape.text_frame
+    title_text_frame.text = "On Street OOH"
+    p = title_text_frame.paragraphs[0]
+    p.font.size = Inches(0.7)
+    p.font.color.rgb = RGBColor(0, 0, 255)
+
+    title_shape.fill.solid()
+    title_shape.fill.fore_color.rgb = RGBColor(255, 165, 0)
+
+    title_shape = intro_slide.shapes.add_textbox(Inches(3.8), Inches(4.2), Inches(5.5), Inches(1))
+    title_text_frame = title_shape.text_frame
+    title_text_frame.text = "Recommendation"
+    p = title_text_frame.paragraphs[0]
+    p.font.size = Inches(0.7)
+    p.font.color.rgb = RGBColor(0, 0, 255)
+
+    title_shape.fill.solid()
+    title_shape.fill.fore_color.rgb = RGBColor(255, 165, 0)
+
+    # Add osmo logo
+    image_path = osmo_logo_path
+    left_inch = Inches(5.7)
+    top_inch = Inches(5.2)
+    width_inch = Inches(2)
+    height_inch = Inches(1.3)
+    intro_slide.shapes.add_picture(image_path, left_inch, top_inch, width_inch, height_inch)
+
+    return intro_slide
+
+def create_area_slide(intro_slide, brand_logo_path, zone="", state="", city=""):
+    
+    # brand logo
+    image_path = brand_logo_path
+    left_inch = Inches(5.5)
+    top_inch = Inches(1.3)
+    width_inch = Inches(2.5)
+    height_inch = Inches(1.5)
+    intro_slide.shapes.add_picture(image_path, left_inch, top_inch, width_inch, height_inch)
+
+    areas = [zone, state, city]
+    top = 3
+
+    for area in areas:
+        # heading
+        title_shape = intro_slide.shapes.add_textbox(Inches(4.5), Inches(top), Inches(4.5), Inches(0.8))
+        title_text_frame = title_shape.text_frame
+        title_text_frame.text = area
+        p = title_text_frame.paragraphs[0]
+        p.font.size = Inches(0.4)
+        p.font.color.rgb = RGBColor(0, 0, 255)
+
+        title_shape.fill.solid()
+        title_shape.fill.fore_color.rgb = RGBColor(255, 165, 0)
+
+        top = top + 0.8
+
+    # Add osmo logo
+    image_path = osmo_logo_path
+    left_inch = Inches(5.7)
+    top_inch = Inches(5.2)
+    width_inch = Inches(2)
+    height_inch = Inches(1.3)
+    intro_slide.shapes.add_picture(image_path, left_inch, top_inch, width_inch, height_inch)
+
+    return intro_slide
