@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 04, 2024 at 09:01 AM
+-- Generation Time: Apr 05, 2024 at 11:23 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -127,7 +127,7 @@ CREATE TABLE `brief_budgets` (
 
 INSERT INTO `brief_budgets` (`budget_id`, `brief_id`, `zone_id`, `state_id`, `city_id`, `budget`) VALUES
 ('43dfd696-ea3a-434c-8c5d-a5a41244e68b', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8', 2, 10, 7, 9000),
-('bc82c708-8725-4d66-ba36-c6e0341a88fa', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8', 5, 9, 6, 8000);
+('bc82c708-8725-4d66-ba36-c6e0341a88fa', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8', 5, 9, 6, 800000);
 
 -- --------------------------------------------------------
 
@@ -185,7 +185,9 @@ CREATE TABLE `plans` (
 --
 
 INSERT INTO `plans` (`plan_id`, `brief_id`, `budget_id`, `user_id`, `video_id`, `location`, `latitude`, `longitude`, `illumination`, `media_type`, `w`, `h`, `qty`, `size`, `duration`, `imp_per_month`, `rental_per_month`, `cost_for_duration`, `printing`, `mounting`, `total`, `status`) VALUES
-('cf88ea16-1eaf-4157-a6c7-9ad41a7f0326', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8', 'bc82c708-8725-4d66-ba36-c6e0341a88fa', 39, '9371b1e0-6542-4419-9d35-f05ecf247d40', 'test', 26.745600, 81.880400, 'illumination', 'media type', 12, 12, 12, 12, 25.00, 156, 12000.00, 10000.00, 17.00, 17.00, 10034.00, 1);
+('30984745-0c2e-4b03-b045-1cf972cca321', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8', 'bc82c708-8725-4d66-ba36-c6e0341a88fa', 39, '9371b1e0-6542-4419-9d35-f05ecf247d40', 'test', 22.715400, 79.706900, 'illumination', 'media type', 20, 20, 56, 56, 21.00, 1267, 500000.00, 350000.00, 61.00, 64.00, 350125.00, 1),
+('2bb8db51-4cb3-49da-9ec5-d2ce2427b8b0', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8', 'bc82c708-8725-4d66-ba36-c6e0341a88fa', 39, '9371b1e0-6542-4419-9d35-f05ecf247d40', 'test', 22.715400, 79.706900, 'illumination', 'media type', 20, 20, 56, 56, 21.00, 1267, 500000.00, 350000.00, 61.00, 64.00, 350125.00, 1),
+('a2f7371c-3e2f-4358-86fe-18fa14519163', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8', 'bc82c708-8725-4d66-ba36-c6e0341a88fa', 39, '9371b1e0-6542-4419-9d35-f05ecf247d40', 'test', 22.715400, 79.706900, 'illumination', 'media type', 20, 20, 56, 56, 21.00, 1267, 500000.00, 350000.00, 61.00, 64.00, 350125.00, 1);
 
 -- --------------------------------------------------------
 

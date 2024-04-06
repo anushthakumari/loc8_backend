@@ -75,6 +75,16 @@ def add_plan(current_user):
     return jsonify({'message': 'Plan added successfully'}), 201
 
       
-# @plans_bp.route('plans/<budget_id>')
-# @token_required
-        
+@plans_bp.route('/plans/<plan_id>', methods=['DELETE'])
+@token_required
+def delete_plan_by_id(current_user, plan_id):
+    query  = """
+        DELETE FROM plans WHERE plan_id=%s
+    """
+
+    args=(plan_id,)
+
+    query_db(query, args, False, True)
+
+    return jsonify({'message': 'Plan deleted succesfully!'}), 200
+
