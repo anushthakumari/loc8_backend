@@ -304,13 +304,18 @@ def getBriefBudgetDetailsByBudgetId(current_user, budget_id):
     current_user_id = current_user['id']
     
     query = """
-            SELECT bb.budget_id, briefs.brief_id, bb.zone_id, bb.state_id, bb.city_id, zones.zone_name, states.state_name, cities.city_name, bb.budget FROM assigned_budgets ab
+            SELECT bb.budget_id, briefs.brief_id, bb.zone_id, bb.state_id, bb.city_id, zones.zone_name, states.state_name, cities.city_name, bb.budget, ab.status 
+            FROM assigned_budgets ab
             INNER JOIN brief_budgets bb ON ab.budget_id = bb.budget_id
             INNER JOIN briefs ON briefs.brief_id=bb.brief_id
             INNER JOIN zones ON bb.zone_id = zones.zone_id
             INNER JOIN states ON bb.state_id = states.state_id
             INNER JOIN cities ON bb.city_id = cities.city_id
-            WHERE ab.budget_id=%s
+            WHERE 
+                    ab.budget_id=%s
+                AND
+                    ab.user_id=%s
+
         """
     
     video_query = """
@@ -323,7 +328,7 @@ def getBriefBudgetDetailsByBudgetId(current_user, budget_id):
         WHERE budget_id=%s AND user_id=%s
     """
 
-    budget = query_db(query, (budget_id,), True)
+    budget = query_db(query, (budget_id, current_user_id), True)
 
     if budget == None:
         return jsonify({}), 200
@@ -353,3 +358,62 @@ def getBriefDetailsForPlanner(current_user, brief_id):
     brief_data["budgets"] = budgets
 
     return jsonify(brief_data), 200
+
+@brief_bp.route('/budgets/<budget_id>/<brief_id>/finish', methods=['PUT'])
+@token_required
+def finish_budget_plan(current_user, budget_id, brief_id):
+    
+    user_id = current_user['id']
+
+    query = """
+        UPDATE assigned_budgets
+            SET status=2
+        WHERE 
+                budget_id=%s
+            AND
+                user_id=%s
+    """
+
+    query_db(query, (budget_id, user_id), True, True)
+
+    query =  """
+        SELECT count(budget_id) 
+        FROM brief_budgets
+        WHERE
+            brief_id=%s
+    """
+
+
+    response = query_db(query, (brief_id,), True)
+
+    # no of budget in the brief
+    n_budgets_in_brief = response['count(budget_id)']
+
+    query =  """
+        SELECT count(assigned_budgets.budget_id)
+        FROM assigned_budgets
+        INNER JOIN brief_budgets
+            ON brief_budgets.budget_id=assigned_budgets.budget_id
+		WHERE
+        		brief_budgets.brief_id=%s
+            AND
+            	assigned_budgets.status=2;
+    """
+
+    response = query_db(query, (brief_id,), True)
+
+    # no of budget completed
+    n_budgets_finished = response['count(assigned_budgets.budget_id)']
+
+    if(n_budgets_in_brief == n_budgets_finished):
+        query = """
+            UPDATE briefs
+                SET status=1
+            WHERE
+                brief_id=%s
+        """
+
+        query_db(query, (brief_id,), True, True)
+
+
+    return jsonify({'message': "Plan updated!"})
