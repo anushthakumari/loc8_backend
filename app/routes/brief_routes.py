@@ -350,6 +350,7 @@ def getBriefBudgetDetailsByBudgetId(current_user, budget_id):
 def getBriefDetailsForPlanner(current_user, brief_id):
 
     brief_data = get_brief_details_by_brief_id(brief_id)
+    user_id = current_user['id']
     
     query = """
             SELECT bb.budget_id, bb.zone_id, bb.state_id, bb.city_id, zones.zone_name, states.state_name, cities.city_name, bb.budget FROM assigned_budgets ab
@@ -358,9 +359,11 @@ def getBriefDetailsForPlanner(current_user, brief_id):
             INNER JOIN states ON bb.state_id = states.state_id
             INNER JOIN cities ON bb.city_id = cities.city_id
             WHERE bb.brief_id=%s
+                AND
+                ab.user_id=%s
         """
     
-    budgets = query_db(query, (brief_id,))
+    budgets = query_db(query, (brief_id, user_id))
 
     brief_data["budgets"] = budgets
 

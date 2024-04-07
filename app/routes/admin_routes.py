@@ -204,8 +204,7 @@ ORDER BY
             return jsonify([])
 
         return jsonify(admins)
-  
-  
+    
 @admin_bp.route('/admins', methods=['POST'])
 @token_required
 @superadmin_required
@@ -285,7 +284,6 @@ def delete_user(current_user,user_id):
         return jsonify({'message': 'user deleted successfully'}), 200
     
     return jsonify({'message': 'You dont have access!'}), 400
-
 
 @admin_bp.route('/admins/<int:user_id>', methods=['PUT'])
 @token_required
