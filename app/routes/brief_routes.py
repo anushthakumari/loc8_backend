@@ -326,8 +326,8 @@ def getBriefBudgetDetailsByBudgetId(current_user, budget_id):
         """
     
     video_query = """
-        SELECT * FROM videofiles
-        WHERE zone_id=%s AND state_id=%s AND city_id=%s
+        SELECT * FROM videofiles v
+        WHERE v.zone_id=%s AND v.state_id=%s AND v.city_id=%s
     """
     
     plans_query = """
@@ -343,7 +343,27 @@ def getBriefBudgetDetailsByBudgetId(current_user, budget_id):
     plans = query_db(plans_query, (budget['budget_id'], current_user_id))
     videos = query_db(video_query, (budget['zone_id'], budget['state_id'], budget['city_id']))
 
-    return jsonify({'budget':  budget, 'videos': videos, 'plans': plans }), 200
+    video_data = []
+
+    if videos:
+        for video in videos:
+            q = """
+                SELECT * FROM video_coordinates
+                WHERE video_id=%s
+            """
+
+            args = (video['video_id'],)
+
+            video_coords = query_db(q, args)
+
+            if video_coords:
+                video['coordinates'] = video_coords
+            else:
+                video['coordinates'] = []
+
+            video_data.append(video)
+
+    return jsonify({'budget':  budget, 'videos': video_data, 'plans': plans }), 200
 
 @brief_bp.route('/briefs/<brief_id>/planner', methods=['GET'])
 @token_required

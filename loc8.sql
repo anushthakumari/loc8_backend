@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 05, 2024 at 11:23 AM
+-- Generation Time: Apr 09, 2024 at 09:08 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -30,16 +30,16 @@ SET time_zone = "+00:00";
 CREATE TABLE `assigned_budgets` (
   `id` varchar(100) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `budget_id` varchar(100) NOT NULL
+  `budget_id` varchar(100) NOT NULL,
+  `status` int(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `assigned_budgets`
 --
 
-INSERT INTO `assigned_budgets` (`id`, `user_id`, `budget_id`) VALUES
-('5c5ed223-e109-4655-936d-49e1f867de61', 39, 'bc82c708-8725-4d66-ba36-c6e0341a88fa'),
-('65648f08-d4d4-48c5-8a9b-c1326fe15507', 39, '43dfd696-ea3a-434c-8c5d-a5a41244e68b');
+INSERT INTO `assigned_budgets` (`id`, `user_id`, `budget_id`, `status`) VALUES
+('7001a0a3-f2e5-4b7f-9223-0150fdef12ff', 39, 'f92657bc-8f51-47f4-9b48-116af6f2b5ab', 1);
 
 -- --------------------------------------------------------
 
@@ -72,10 +72,24 @@ CREATE TABLE `billboards` (
 --
 
 INSERT INTO `billboards` (`id`, `video_id`, `visibility_duration`, `distance_to_center`, `central_duration`, `near_p_duration`, `mid_p_duration`, `far_p_duration`, `central_distance`, `near_p_distance`, `mid_p_distance`, `far_p_distance`, `average_areas`, `confidence`, `tracker_id`, `created_at`, `created_by_user_id`) VALUES
-('7864676f-8f31-47ca-90e8-2a0c756b8294', '9371b1e0-6542-4419-9d35-f05ecf247d40', 4.36667, 42.2614, 0, 1.83333, 1.56667, 0.766667, 0, 66.924, 75.9757, 87.507, 2.39415, 0.706747, 2, '2024-04-03 16:12:56', 1),
-('8245b458-5541-4ef9-9c37-0b3bbb7e043e', '9371b1e0-6542-4419-9d35-f05ecf247d40', 0.933333, 12.7545, 0.233333, 0.7, 0, 0, 60.0628, 61.1341, 0, 0, 1.10103, 0.690164, 4, '2024-04-03 16:12:56', 1),
-('886cd23b-f047-46a6-8d23-be62db3fd72e', '9371b1e0-6542-4419-9d35-f05ecf247d40', 2.9, 25.0201, 0, 2.43333, 0.466667, 0, 0, 65.7549, 72.5264, 0, 1.70951, 0.725351, 3, '2024-04-03 16:12:56', 1),
-('e8e7b674-35fd-49f6-8ec4-a0ff039bb009', '9371b1e0-6542-4419-9d35-f05ecf247d40', 2, 42.2873, 0, 0, 0.966667, 1.03333, 0, 0, 77.9903, 86.8466, 3.0619, 0.670036, 1, '2024-04-03 16:12:56', 1);
+('0c597ecf-6e37-445a-be17-ef66ffe1b32e', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 0.533333, 40.9304, 0, 0.1, 0.3, 0.133333, 0, 37.5667, 35.1676, 32.6411, 1.94432, 0.739295, 14, '2024-04-09 16:34:17', 1),
+('1d68f8e9-f6b4-4c38-9fb5-d2ffeea24aa7', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 2.4, 40.1955, 0, 0.433333, 1.2, 0.5, 0, 71.4329, 77.2636, 86.201, 3.88608, 0.684429, 1, '2024-04-09 16:34:17', 1),
+('2f52bbaf-16b1-4896-9e9d-5ca434127729', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 6.33333, 42.3777, 0, 2.63333, 2.1, 1.43333, 0, 67.603, 76.5585, 86.6283, 2.02649, 0.721102, 5, '2024-04-09 16:34:17', 1),
+('4a99c16c-9857-4f88-82d8-9f8973d459e8', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 0.966667, 41.6873, 0, 0.266667, 0.466667, 0.233333, 0, 70.3299, 77.5462, 87.3839, 1.40408, 0.705476, 13, '2024-04-09 16:34:17', 1),
+('4cf1e31b-4b3e-42a4-b4e1-4e6e760761b3', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 4.46667, 41.9305, 0, 0, 3.36667, 0.4, 0, 0, 34.4727, 28.3116, 1.26869, 0.72868, 2, '2024-04-09 16:34:17', 1),
+('610bd002-53a3-4c6b-b182-25639d7deb7c', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 0.933333, 42.504, 0, 0.366667, 0.333333, 0.233333, 0, 68.5697, 76.9632, 87.4756, 1.31983, 0.764694, 10, '2024-04-09 16:34:17', 1),
+('679af46e-ef32-4934-ba07-295f7efe2fae', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 0.766667, 41.9534, 0, 0.1, 0.4, 0.266667, 0, 70.874, 76.4563, 86.3429, 0.943969, 0.743478, 4, '2024-04-09 16:34:17', 1),
+('7771a603-7f16-485e-ac20-8da8639943ba', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 6.23333, 44.0014, 0, 0.7, 3.26667, 1.76667, 0, 38.2006, 35.9821, 34.6587, 1.99876, 0.717535, 9, '2024-04-09 16:34:17', 1),
+('89346ab7-e885-4efb-8a99-88ba81a05a99', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 1, 42.3359, 0, 0.2, 0.466667, 0.333333, 0, 70.3933, 76.3913, 86.5541, 0.92436, 0.723418, 16, '2024-04-09 16:34:17', 1),
+('8f376d3d-e44b-4e35-8797-5a4538890145', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 1, 40.9369, 0, 0.466667, 0.366667, 0.166667, 0, 38.7022, 35.3083, 33.2759, 0.920398, 0.723142, 17, '2024-04-09 16:34:17', 1),
+('a96520e8-09a9-429e-b35c-0b99a858ad9d', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 3.9, 42.8312, 0, 0, 0.866667, 3.03333, 0, 0, 31.9581, 30.6685, 2.33467, 0.766603, 6, '2024-04-09 16:34:17', 1),
+('aaf8d7e9-5833-4ccb-8d0e-eb1b3d3c4cee', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 1.4, 42.2205, 0, 0.566667, 0.266667, 0.333333, 0, 67.6754, 77.9174, 87.145, 1.48693, 0.682638, 18, '2024-04-09 16:34:17', 1),
+('ad5b9617-fb38-4ee6-b822-041a0b2d93cd', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 2.06667, 42.0527, 0, 0, 0, 0.733333, 0, 0, 0, 30.3151, 1.25907, 0.642193, 3, '2024-04-09 16:34:17', 1),
+('bf113c58-13a6-4267-b5c5-a2b534a215cc', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 0.966667, 42.7744, 0, 0.266667, 0.4, 0.3, 0, 69.8988, 77.0088, 87.527, 1.08155, 0.763546, 20, '2024-04-09 16:34:17', 1),
+('bfe99e47-352f-4d93-98d1-f7ef3c577ddb', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 1.03333, 41.9312, 0, 0.233333, 0.466667, 0.333333, 0, 69.9373, 76.3831, 86.6714, 1.70097, 0.741187, 15, '2024-04-09 16:34:17', 1),
+('c5b39eb3-17a6-4e52-91af-960bf208113e', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 1.23333, 41.5504, 0, 0.7, 0.366667, 0.166667, 0, 40.3933, 37.7891, 37.3382, 2.09892, 0.721678, 19, '2024-04-09 16:34:17', 1),
+('fc09491e-33f0-4377-a375-432c6c3e990d', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 1.06667, 43.2117, 0, 0.533333, 0.3, 0.166667, 0, 67.6631, 77.8671, 87.406, 1.90239, 0.699582, 8, '2024-04-09 16:34:17', 1),
+('fc5e92a5-87f4-4b45-afa9-c4c8a5d87a22', '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 2.23333, 41.2883, 0, 0.1, 0.6, 0.433333, 0, 72.2848, 75.6743, 86.6601, 3.1917, 0.615183, 7, '2024-04-09 16:34:17', 1);
 
 -- --------------------------------------------------------
 
@@ -104,7 +118,7 @@ CREATE TABLE `briefs` (
 --
 
 INSERT INTO `briefs` (`brief_id`, `category`, `brand_name`, `brand_logo`, `target_audience`, `campaign_obj`, `media_approach`, `is_immediate_camp`, `start_date`, `notes`, `status`, `created_at`, `created_by_user_id`) VALUES
-('d081a45a-b6a6-40d7-a955-47eabaa21ab8', 'category', 'brand', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8loan-1.jpg', 'target', 'camp', 'med', 0, NULL, NULL, 0, '2024-04-03 01:18:46', 1);
+('2b4baa8d-4727-4679-a89f-32875e85412a', 'test', 'max life', '2b4baa8d-4727-4679-a89f-32875e85412aMax_Life_Insurance_logo.png', 'middle class', 'insurance', 'media', 0, NULL, NULL, 0, '2024-04-09 17:12:48', 34);
 
 -- --------------------------------------------------------
 
@@ -126,8 +140,7 @@ CREATE TABLE `brief_budgets` (
 --
 
 INSERT INTO `brief_budgets` (`budget_id`, `brief_id`, `zone_id`, `state_id`, `city_id`, `budget`) VALUES
-('43dfd696-ea3a-434c-8c5d-a5a41244e68b', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8', 2, 10, 7, 9000),
-('bc82c708-8725-4d66-ba36-c6e0341a88fa', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8', 5, 9, 6, 800000);
+('f92657bc-8f51-47f4-9b48-116af6f2b5ab', '2b4baa8d-4727-4679-a89f-32875e85412a', 3, 11, 8, 200000);
 
 -- --------------------------------------------------------
 
@@ -147,7 +160,8 @@ CREATE TABLE `cities` (
 
 INSERT INTO `cities` (`city_id`, `city_name`, `state_id`) VALUES
 (6, 'new york city', 9),
-(7, 'south city', 10);
+(7, 'south city', 10),
+(8, 'mumbai', 11);
 
 -- --------------------------------------------------------
 
@@ -177,17 +191,10 @@ CREATE TABLE `plans` (
   `printing` decimal(10,2) NOT NULL,
   `mounting` decimal(10,2) NOT NULL,
   `total` decimal(10,2) NOT NULL,
+  `map_image` varchar(250) NOT NULL,
+  `site_image` varchar(250) NOT NULL,
   `status` int(2) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `plans`
---
-
-INSERT INTO `plans` (`plan_id`, `brief_id`, `budget_id`, `user_id`, `video_id`, `location`, `latitude`, `longitude`, `illumination`, `media_type`, `w`, `h`, `qty`, `size`, `duration`, `imp_per_month`, `rental_per_month`, `cost_for_duration`, `printing`, `mounting`, `total`, `status`) VALUES
-('30984745-0c2e-4b03-b045-1cf972cca321', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8', 'bc82c708-8725-4d66-ba36-c6e0341a88fa', 39, '9371b1e0-6542-4419-9d35-f05ecf247d40', 'test', 22.715400, 79.706900, 'illumination', 'media type', 20, 20, 56, 56, 21.00, 1267, 500000.00, 350000.00, 61.00, 64.00, 350125.00, 1),
-('2bb8db51-4cb3-49da-9ec5-d2ce2427b8b0', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8', 'bc82c708-8725-4d66-ba36-c6e0341a88fa', 39, '9371b1e0-6542-4419-9d35-f05ecf247d40', 'test', 22.715400, 79.706900, 'illumination', 'media type', 20, 20, 56, 56, 21.00, 1267, 500000.00, 350000.00, 61.00, 64.00, 350125.00, 1),
-('a2f7371c-3e2f-4358-86fe-18fa14519163', 'd081a45a-b6a6-40d7-a955-47eabaa21ab8', 'bc82c708-8725-4d66-ba36-c6e0341a88fa', 39, '9371b1e0-6542-4419-9d35-f05ecf247d40', 'test', 22.715400, 79.706900, 'illumination', 'media type', 20, 20, 56, 56, 21.00, 1267, 500000.00, 350000.00, 61.00, 64.00, 350125.00, 1);
 
 -- --------------------------------------------------------
 
@@ -228,7 +235,8 @@ CREATE TABLE `states` (
 
 INSERT INTO `states` (`state_id`, `state_name`, `zone_id`) VALUES
 (9, 'new york state', 5),
-(10, 'south state', 2);
+(10, 'south state', 2),
+(11, 'maharashtra', 3);
 
 -- --------------------------------------------------------
 
@@ -256,7 +264,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `email`, `password`, `role_id`, `first_name`, `last_name`, `employee_id`, `created_at`, `updated_at`, `created_by_user_id`) VALUES
 (1, 'john@mail.com', '$2b$12$LGEvisGVlhfcCOF0R3KGD.EJNP4TZOyCv89zgHkbrC3Ucb5aO6x76', 4, 'John', 'Doe', '12345', '2024-03-06 18:00:33', '2024-03-20 15:38:18', 0),
 (33, 'test@mail.com', '$2b$12$O7CNwBTngCzvIlPr430J6uilaOC6tKDG93C6.30DEFXMbaKNafQu6', 2, 'rem1', 'rem1', '123454', '2024-03-31 15:39:19', '2024-03-31 18:49:00', 1),
-(34, 'test@gmail.com', '$2b$12$C5M5/QXsZ7N5X7262xeCMOPNWPRhhviFe636k8kVY1KyhyHX40z2O', 3, 'test', 'controller', '7895', '2024-04-01 16:25:17', '2024-04-01 16:49:19', 1),
+(34, 'controller1@mail.com', '$2b$12$5494Y9kAG2QnuomroKX1UeUvTk6Buy0SaUpiSLD5AXjz86FatsI2i', 3, 'test', 'controller', '7895', '2024-04-01 16:25:17', '2024-04-06 14:02:47', 1),
 (36, 'test@email.com', '$2b$12$47bl28GpPwOwnIMz4JFDRe4C5dJwP7tKbC4eLatWcbveLNxWVMNOu', 2, 'test', 'test', 'emp_4', '2024-04-01 16:48:01', '2024-04-01 16:48:29', 1),
 (39, 'planner1@mail.com', '$2b$12$CliLWWqa/NLjbMMV7oGJ8eZGAhnNFo2WHh.YC05mJuVeGHSvJDqsW', 1, 'planner', '1', 'planner_emp_1', '2024-04-02 18:47:29', '2024-04-03 01:20:11', 1);
 
@@ -283,8 +291,7 @@ INSERT INTO `user_areas` (`id`, `user_id`, `zone_id`, `state_id`, `city_id`) VAL
 (2, 36, 1, NULL, NULL),
 (5, 34, 5, 9, 6),
 (6, 34, 2, 10, 7),
-(8, 39, 5, 9, 6),
-(9, 39, 2, 10, 7);
+(10, 39, 3, 11, 8);
 
 -- --------------------------------------------------------
 
@@ -308,7 +315,33 @@ CREATE TABLE `videofiles` (
 --
 
 INSERT INTO `videofiles` (`video_id`, `filename`, `zone_id`, `state_id`, `city_id`, `created_at`, `created_by_user_id`, `video_path`) VALUES
-('9371b1e0-6542-4419-9d35-f05ecf247d40', 'a7bd51c3-3d6d-4dba-9751-8cd81dff381d.mp4', 5, 9, 6, '2024-04-03 16:12:56', 1, './instance/a7bd51c3-3d6d-4dba-9751-8cd81dff381d.mp4');
+('1d616347-94a1-4ac0-a672-db8f6a8a49d1', '99352fca-85f6-422c-b539-bddfbccd5601.mp4', 3, 11, 8, '2024-04-09 16:34:17', 1, './instance/99352fca-85f6-422c-b539-bddfbccd5601.mp4');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `video_coordinates`
+--
+
+CREATE TABLE `video_coordinates` (
+  `video_id` varchar(40) NOT NULL,
+  `id` int(11) NOT NULL,
+  `speed` int(11) NOT NULL,
+  `latitude` decimal(9,6) NOT NULL,
+  `longitude` decimal(9,6) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `video_coordinates`
+--
+
+INSERT INTO `video_coordinates` (`video_id`, `id`, `speed`, `latitude`, `longitude`) VALUES
+('1d616347-94a1-4ac0-a672-db8f6a8a49d1', 2, 80, 18.929500, 73.162400),
+('1d616347-94a1-4ac0-a672-db8f6a8a49d1', 3, 73, 18.927900, 73.164000),
+('1d616347-94a1-4ac0-a672-db8f6a8a49d1', 4, 76, 18.926600, 73.165100),
+('1d616347-94a1-4ac0-a672-db8f6a8a49d1', 5, 80, 18.925000, 73.166400),
+('1d616347-94a1-4ac0-a672-db8f6a8a49d1', 6, 75, 18.923600, 73.167900),
+('1d616347-94a1-4ac0-a672-db8f6a8a49d1', 7, 54, 18.921400, 73.170400);
 
 -- --------------------------------------------------------
 
@@ -381,6 +414,7 @@ ALTER TABLE `cities`
 -- Indexes for table `plans`
 --
 ALTER TABLE `plans`
+  ADD PRIMARY KEY (`plan_id`),
   ADD KEY `brief_id` (`brief_id`),
   ADD KEY `budget_id` (`budget_id`),
   ADD KEY `user_id` (`user_id`),
@@ -432,6 +466,13 @@ ALTER TABLE `videofiles`
   ADD KEY `created_by_user_id` (`created_by_user_id`);
 
 --
+-- Indexes for table `video_coordinates`
+--
+ALTER TABLE `video_coordinates`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `video_id` (`video_id`);
+
+--
 -- Indexes for table `zones`
 --
 ALTER TABLE `zones`
@@ -445,7 +486,7 @@ ALTER TABLE `zones`
 -- AUTO_INCREMENT for table `cities`
 --
 ALTER TABLE `cities`
-  MODIFY `city_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `city_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -457,7 +498,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `states`
 --
 ALTER TABLE `states`
-  MODIFY `state_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `state_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -469,7 +510,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_areas`
 --
 ALTER TABLE `user_areas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `video_coordinates`
+--
+ALTER TABLE `video_coordinates`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `zones`
@@ -554,6 +601,12 @@ ALTER TABLE `videofiles`
   ADD CONSTRAINT `videofiles_ibfk_2` FOREIGN KEY (`state_id`) REFERENCES `states` (`state_id`),
   ADD CONSTRAINT `videofiles_ibfk_3` FOREIGN KEY (`city_id`) REFERENCES `cities` (`city_id`),
   ADD CONSTRAINT `videofiles_ibfk_4` FOREIGN KEY (`created_by_user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `video_coordinates`
+--
+ALTER TABLE `video_coordinates`
+  ADD CONSTRAINT `video_coordinates_ibfk_1` FOREIGN KEY (`video_id`) REFERENCES `videofiles` (`video_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

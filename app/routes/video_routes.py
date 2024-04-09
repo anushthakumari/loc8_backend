@@ -8,7 +8,8 @@ from app.utils.db_helper import query_db
 from app.utils.helpers import generate_uuid
 from app.constants.roles import roles
 from app import socketio
-from flask_socketio import emit
+
+from app.utils.video_helpers import get_coordinates_from_video
 
 video_bp = Blueprint('videos', __name__)
 
@@ -101,6 +102,15 @@ def upload(current_user):
 
     video_id = insert_video_data(output_file_path, filename, zone_id, state_id, city_id, current_user['id'])
     insert_billboard_data(video_id, current_user['id'], vcd)
+
+    coordinate_tuples = get_coordinates_from_video(dest)
+
+    coordinates_q = """
+        INSERT INTO `video_coordinates`(`video_id`, `speed`, `latitude`, `longitude`) 
+        VALUES (%s, %s, %s, %s)
+    """
+    for coords in coordinate_tuples:
+        query_db(coordinates_q, (video_id, coords[0], coords[1], coords[2]), False, True)
 
     bill_q = "SELECT * FROM billboards WHERE video_id = %s";
     billboards = query_db(bill_q, (video_id,))
