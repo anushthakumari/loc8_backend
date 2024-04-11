@@ -448,6 +448,32 @@ def finish_budget_plan(current_user, budget_id, brief_id):
 
     return jsonify({'message': "Plan updated!"})
 
+@brief_bp.route("/briefs/<brief_id>/plans")
+@token_required
+def get_plans_by_brief_id(current_user, brief_id):
+
+    q = """
+            SELECT p.*, z.zone_name, s.state_name, c.city_name FROM plans p
+            INNER JOIN brief_budgets bb 
+            ON p.budget_id=bb.budget_id
+            INNER JOIN zones z
+            ON z.zone_id=bb.zone_id
+            INNER JOIN states s
+            ON s.state_id=bb.state_id
+            INNER JOIN cities c
+            ON c.city_id=bb.city_id
+            WHERE p.brief_id=%s
+        """
+    args=(brief_id,)
+
+    plan_details = query_db(q, args)
+
+    if plan_details == None:
+       return jsonify([]), 200
+   
+    return jsonify(plan_details), 200
+
+
 @brief_bp.route('/briefs/<brief_id>/download', methods=['GET'])
 @token_required
 def download_plan(current_user, brief_id):
@@ -495,7 +521,7 @@ def download_plan(current_user, brief_id):
 
         for plan in plans:
             location  = plan['location']
-            size_text = "Size: {}×{}".format(plan['h'], plan['w'])
+            size_text = "Size: {}×{}".format(plan['height'], plan['width'])
 
             plan_slide = prs.slides.add_slide(blank_slide_layout)
 
@@ -504,7 +530,7 @@ def download_plan(current_user, brief_id):
             title_text_frame = title_shape.text_frame
             title_text_frame.text = "{}   {}".format(location, size_text)
             p = title_text_frame.paragraphs[0]
-            p.font.size = Inches(0.5)
+            p.font.size = Inches(0.3)
             p.font.color.rgb = RGBColor(255, 165, 0)
 
             title_shape.fill.solid()

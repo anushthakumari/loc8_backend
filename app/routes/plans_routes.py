@@ -36,30 +36,35 @@ def add_plan(current_user):
     #data
     media_type = data['media_type']
     illumination = data['illumination']
+
     location = data['location']
     latitude = float(data['latitude'])
     longitude = float(data['longitude'])
 
     duration = float(data['duration'])
     imp_per_month =  float(data['imp_per_month'])
-    mounting = int(data['mounting'])
-    cost_for_duration = float(data['cost_for_duration'])
-    printing = int(data['printing'])
+    mounting_rate = float(data['mounting'])
+    printing_rate = float(data['printing'])
     rental_per_month = float(data['rental_per_month'])
-    h = float(data['h'])
+
+    height = float(data['h'])
+    width = float(data['w'])
     qty = int(data['qty'])
-    size = int(data['size'])
-    w = int(data['w'])
+    size = float(data['size'])
+    units = float(data['units'])
+    
     brief_id = data['brief_id']
     budget_id = data['budget_id']
     video_id = data['video_id']
 
-    printing = size * float(printing)
-    mounting = size * float(mounting)
+    printing_cost = size * printing_rate
+    mounting_cost = size * mounting_rate
+    cost_for_duration = (rental_per_month * duration) / 30
+
+    total = cost_for_duration + printing_cost + mounting_cost
+    total_area = width * height * units
 
     plan_id = generate_uuid()
-
-    total = cost_for_duration + printing + mounting
 
     map_img_filename = generate_uuid() + secure_filename(map_image_file.filename)
     site_img_filename = generate_uuid() + secure_filename(site_image_file.filename)
@@ -69,11 +74,12 @@ def add_plan(current_user):
             plan_id, brief_id, budget_id, 
             user_id, video_id, location, 
             latitude, longitude, illumination, 
-            media_type, w, h, 
-            qty, size, duration, 
-            imp_per_month, rental_per_month, cost_for_duration, 
-            printing, mounting, total, 
-            map_image, site_image
+            media_type, width, height, 
+            qty, size, units, 
+            duration, imp_per_month, rental_per_month, 
+            printing_rate, mounting_rate, cost_for_duration, 
+            printing_cost, mounting_cost, total, 
+            total_area, map_image, site_image
         ) VALUES (
             %s, %s, %s,
             %s, %s, %s,
@@ -82,19 +88,21 @@ def add_plan(current_user):
             %s, %s, %s,
             %s, %s, %s,
             %s, %s, %s,
-            %s, %s
+            %s, %s, %s,
+            %s, %s, %s
         )
     """
 
     args = (
-        plan_id, brief_id, budget_id,
-        current_user_id, video_id, location,
-        latitude, longitude, illumination,
-        media_type, w, h, 
-        qty, size, duration, 
-        imp_per_month, rental_per_month, cost_for_duration, 
-        printing, mounting, total,
-        map_img_filename, site_img_filename
+        plan_id, brief_id, budget_id, 
+        current_user_id, video_id, location, 
+        latitude, longitude, illumination, 
+        media_type, width, height, 
+        qty, size, units, 
+        duration, imp_per_month, rental_per_month, 
+        printing_rate, mounting_rate, cost_for_duration, 
+        printing_cost, mounting_cost, total, 
+        total_area, map_img_filename, site_img_filename
     )
 
     query_db(query, args, True, True)
@@ -118,3 +126,10 @@ def delete_plan_by_id(current_user, plan_id):
 
     return jsonify({'message': 'Plan deleted succesfully!'}), 200
 
+
+# // 1) Mounting Rate
+# // 2) Printing Rate
+# // 3) Mounting Cost
+# // 4) Printing Cost
+# // 5) Total Cost (Display Cost of Duration + Printing Cost + Mounting Cost)
+# // 6) Total Area = W*H*Units

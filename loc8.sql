@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 09, 2024 at 09:08 PM
+-- Generation Time: Apr 11, 2024 at 05:18 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -39,7 +39,7 @@ CREATE TABLE `assigned_budgets` (
 --
 
 INSERT INTO `assigned_budgets` (`id`, `user_id`, `budget_id`, `status`) VALUES
-('7001a0a3-f2e5-4b7f-9223-0150fdef12ff', 39, 'f92657bc-8f51-47f4-9b48-116af6f2b5ab', 1);
+('7001a0a3-f2e5-4b7f-9223-0150fdef12ff', 39, 'f92657bc-8f51-47f4-9b48-116af6f2b5ab', 2);
 
 -- --------------------------------------------------------
 
@@ -118,7 +118,7 @@ CREATE TABLE `briefs` (
 --
 
 INSERT INTO `briefs` (`brief_id`, `category`, `brand_name`, `brand_logo`, `target_audience`, `campaign_obj`, `media_approach`, `is_immediate_camp`, `start_date`, `notes`, `status`, `created_at`, `created_by_user_id`) VALUES
-('2b4baa8d-4727-4679-a89f-32875e85412a', 'test', 'max life', '2b4baa8d-4727-4679-a89f-32875e85412aMax_Life_Insurance_logo.png', 'middle class', 'insurance', 'media', 0, NULL, NULL, 0, '2024-04-09 17:12:48', 34);
+('2b4baa8d-4727-4679-a89f-32875e85412a', 'test', 'max life', '2b4baa8d-4727-4679-a89f-32875e85412aMax_Life_Insurance_logo.png', 'middle class', 'insurance', 'media', 0, NULL, NULL, 1, '2024-04-09 17:12:48', 34);
 
 -- --------------------------------------------------------
 
@@ -180,21 +180,32 @@ CREATE TABLE `plans` (
   `longitude` decimal(9,6) NOT NULL,
   `illumination` varchar(200) NOT NULL,
   `media_type` varchar(150) NOT NULL,
-  `w` int(8) NOT NULL,
-  `h` int(8) NOT NULL,
+  `width` float NOT NULL,
+  `height` float NOT NULL,
   `qty` int(5) NOT NULL,
-  `size` int(10) NOT NULL,
+  `size` float NOT NULL,
+  `units` decimal(8,3) NOT NULL,
   `duration` decimal(5,2) NOT NULL,
-  `imp_per_month` int(10) NOT NULL,
+  `imp_per_month` decimal(5,2) NOT NULL,
   `rental_per_month` decimal(10,2) NOT NULL,
+  `printing_rate` decimal(4,2) NOT NULL,
+  `mounting_rate` decimal(4,2) NOT NULL,
   `cost_for_duration` decimal(10,2) NOT NULL,
-  `printing` decimal(10,2) NOT NULL,
-  `mounting` decimal(10,2) NOT NULL,
+  `printing_cost` decimal(10,2) NOT NULL,
+  `mounting_cost` decimal(10,2) NOT NULL,
   `total` decimal(10,2) NOT NULL,
+  `total_area` decimal(10,3) NOT NULL,
   `map_image` varchar(250) NOT NULL,
   `site_image` varchar(250) NOT NULL,
   `status` int(2) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `plans`
+--
+
+INSERT INTO `plans` (`plan_id`, `brief_id`, `budget_id`, `user_id`, `video_id`, `location`, `latitude`, `longitude`, `illumination`, `media_type`, `width`, `height`, `qty`, `size`, `units`, `duration`, `imp_per_month`, `rental_per_month`, `printing_rate`, `mounting_rate`, `cost_for_duration`, `printing_cost`, `mounting_cost`, `total`, `total_area`, `map_image`, `site_image`, `status`) VALUES
+('303f37bb-e6bd-471c-8f61-1e1b108f2d48', '2b4baa8d-4727-4679-a89f-32875e85412a', 'f92657bc-8f51-47f4-9b48-116af6f2b5ab', 39, '1d616347-94a1-4ac0-a672-db8f6a8a49d1', 'SH82, Panvel, Raigad, Maharashtra, 410222, India', 18.915218, 73.152751, 'Front Lit', 'Billboard', 500, 500, 5, 800, 52.000, 25.00, 21.00, 56000.00, 8.00, 5.00, 46666.67, 6400.00, 4000.00, 57066.67, 9999999.999, 'd9494d32-93af-4fe9-a1c7-c17f1edfa8a9map.png', 'ae37dd02-2583-476a-a4cb-3739c02e4337renault_images.jpeg', 1);
 
 -- --------------------------------------------------------
 
