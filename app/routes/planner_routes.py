@@ -158,6 +158,19 @@ def assignAreas(current_user, user_id):
         if not area['city_id']:
             return jsonify({"message": "city is required"}), 400    
         
+
+    for area in data:
+        q ="""
+            SELECT * FROM user_areas
+            WHERE zone_id=%s AND state_id=%s AND city_id=%s
+        """
+        args = (area['zone_id'], area['state_id'], area['city_id'])
+
+        users = query_db(q, args)
+
+        if users != None:
+            return jsonify({"message": "A Planner with this zone-state-city is already assigned!"}), 400
+        
     try:
         query_db("START TRANSACTION")
 
