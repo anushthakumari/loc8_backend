@@ -3,6 +3,7 @@ import base64
 import requests
 import re
 import os
+import math
 
 api_key = os.getenv('GOOGLE_VISION_API_KEY')
 
@@ -34,44 +35,54 @@ def detect_text(image_content):
 def get_coordinates_from_video(video_path, interval=10):
     cap = cv2.VideoCapture(video_path)
     frame_rate = cap.get(cv2.CAP_PROP_FPS)
+
+    frame_rate = math.ceil(frame_rate)
     frame_count = 0
     detected_texts = []
 
-    while cap.isOpened():
+    if not cap.isOpened():
+        print("Error: Failed to open video capture")
+        return
+
+    while True:
+
+        cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + interval * frame_rate)
         ret, frame = cap.read()
+
         if not ret:
+            print("End of video")
             break
 
-        # Extract frame every 'interval' seconds
-        if frame_count % (interval * frame_rate) == 0:
-            # Convert frame to image content
-            height, width, _ = frame.shape
-            roi_top = int(0.85 * height)
-            roi_bottom = int(0.95 * height)
-            roi_left = int(0.13 * width)
-            roi_right = int(0.57 * width)
-            roi = frame[roi_top:roi_bottom, roi_left:roi_right]
-            image_content_base64 = base64.b64encode(frame).decode('utf-8')
-            _, buffer = cv2.imencode('.jpg', roi)
-            image_content = buffer.tobytes()
+        # Convert frame to image content
+        height, width, _ = frame.shape
+        roi_top = int(0.85 * height)
+        roi_bottom = int(0.95 * height)
+        roi_left = int(0.13 * width)
+        roi_right = int(0.57 * width)
+        roi = frame[roi_top:roi_bottom, roi_left:roi_right]
 
-            # Perform text detection
-            api_response = detect_text(image_content)
+        _, buffer = cv2.imencode('.jpg', roi)
+        image_content = buffer.tobytes()
 
-            # Process API response
-            if 'textAnnotations' in api_response['responses'][0]:
-                detected_text = api_response['responses'][0]['textAnnotations'][0]['description']
+        # print('Detected text at {} seconds'.format(frame_count // frame_rate))
 
-                data_from_detected_text = detected_text_to_data(detected_text)
+        api_response = detect_text(image_content)
 
-                if data_from_detected_text != None:
-                    detected_texts.append(data_from_detected_text)
-                    
-                print('Detected text at {} seconds: {}'.format(frame_count // frame_rate, detected_text))
-            else:
-                print('No text detected at {} seconds.'.format(frame_count // frame_rate))
+        # Process API response
+        if api_response and 'textAnnotations' in api_response['responses'][0]:
+            detected_text = api_response['responses'][0]['textAnnotations'][0]['description']
 
-        frame_count += 1
+            print('Detected text at {} seconds: {}'.format(frame_count // frame_rate, detected_text))
+
+            data_from_detected_text = detected_text_to_data(detected_text)
+
+            if data_from_detected_text != None:
+                detected_texts.append(data_from_detected_text)
+                
+        else:
+            print('No text detected at {} seconds.'.format(frame_count // frame_rate))
+
+        frame_count += interval * frame_rate
 
     cap.release()
     return detected_texts
