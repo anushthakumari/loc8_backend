@@ -41,23 +41,23 @@ def get_all_videos(current_user):
     user_role_id = current_user['role_id']
     user_id = current_user['id']
     video_q = ""
+    video_details = []
+    response = []
 
     if user_role_id == roles.get('SUPERADMIN'):
-         video_q = """
+        video_q = """
             SELECT 	billboards.*, 
                     videofiles.filename, videofiles.video_path, 
                     videofiles.created_at, videofiles.created_by_user_id,
                     states.state_name, cities.city_name, zones.zone_name
             FROM billboards
-            JOIN videofiles ON billboards.video_id = videofiles.video_id
-            JOIN states ON videofiles.state_id = states.state_id
-            JOIN cities ON videofiles.city_id = cities.city_id
-            JOIN zones ON videofiles.zone_id = zones.zone_id;
+            INNER JOIN videofiles ON billboards.video_id = videofiles.video_id
+            INNER JOIN states ON videofiles.state_id = states.state_id
+            INNER JOIN cities ON videofiles.city_id = cities.city_id
+            INNER JOIN zones ON videofiles.zone_id = zones.zone_id
          """
 
-         video_details = query_db(video_q, ())
-
-         return jsonify(video_details), 200
+        video_details = query_db(video_q, ())
 
     else: 
         video_q = """
@@ -74,7 +74,50 @@ def get_all_videos(current_user):
         """
         video_details = query_db(video_q, (user_id,))
 
-        return jsonify(video_details), 200
+    coordinates_by_video = {};
+
+    for billboard_details in video_details:
+
+        video_id = billboard_details['video_id']
+
+        if video_id not in coordinates_by_video:
+            video_coordinates = query_db("""
+                        SELECT * FROM video_coordinates WHERE video_id=%s
+                """, (billboard_details['video_id'],))
+            coordinates_by_video[video_id] = video_coordinates
+
+        # for coords in coordinates_by_video:
+
+
+        billboard_details['latitude1'] = coordinates_by_video[video_id][0]['latitude']
+        billboard_details['longitude1'] = coordinates_by_video[video_id][0]['longitude']
+        billboard_details['speed1'] = coordinates_by_video[video_id][0]['speed']
+
+        billboard_details['latitude2'] = coordinates_by_video[video_id][1]['latitude']
+        billboard_details['longitude2'] = coordinates_by_video[video_id][1]['longitude']
+        billboard_details['speed2'] = coordinates_by_video[video_id][1]['speed']
+
+        billboard_details['latitude3'] = coordinates_by_video[video_id][2]['latitude']
+        billboard_details['longitude3'] = coordinates_by_video[video_id][2]['longitude']
+        billboard_details['speed3'] = coordinates_by_video[video_id][2]['speed']
+
+        billboard_details['latitude4'] = coordinates_by_video[video_id][3]['latitude']
+        billboard_details['longitude4'] = coordinates_by_video[video_id][3]['longitude']
+        billboard_details['speed4'] = coordinates_by_video[video_id][3]['speed']
+
+        billboard_details['latitude5'] = coordinates_by_video[video_id][4]['latitude']
+        billboard_details['longitude5'] = coordinates_by_video[video_id][4]['longitude']
+        billboard_details['speed5'] = coordinates_by_video[video_id][4]['speed']
+
+        billboard_details['latitude6'] = coordinates_by_video[video_id][5]['latitude']
+        billboard_details['longitude6'] = coordinates_by_video[video_id][5]['longitude']
+        billboard_details['speed6'] = coordinates_by_video[video_id][5]['speed']
+
+        response.append(billboard_details)
+
+    
+    return jsonify(video_details), 200
+
 
 @video_bp.route('/upload', methods=['POST',])
 @token_required
