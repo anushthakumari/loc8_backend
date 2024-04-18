@@ -86,32 +86,10 @@ def get_all_videos(current_user):
                 """, (billboard_details['video_id'],))
             coordinates_by_video[video_id] = video_coordinates
 
-        # for coords in coordinates_by_video:
-
-
-        billboard_details['latitude1'] = coordinates_by_video[video_id][0]['latitude']
-        billboard_details['longitude1'] = coordinates_by_video[video_id][0]['longitude']
-        billboard_details['speed1'] = coordinates_by_video[video_id][0]['speed']
-
-        billboard_details['latitude2'] = coordinates_by_video[video_id][1]['latitude']
-        billboard_details['longitude2'] = coordinates_by_video[video_id][1]['longitude']
-        billboard_details['speed2'] = coordinates_by_video[video_id][1]['speed']
-
-        billboard_details['latitude3'] = coordinates_by_video[video_id][2]['latitude']
-        billboard_details['longitude3'] = coordinates_by_video[video_id][2]['longitude']
-        billboard_details['speed3'] = coordinates_by_video[video_id][2]['speed']
-
-        billboard_details['latitude4'] = coordinates_by_video[video_id][3]['latitude']
-        billboard_details['longitude4'] = coordinates_by_video[video_id][3]['longitude']
-        billboard_details['speed4'] = coordinates_by_video[video_id][3]['speed']
-
-        billboard_details['latitude5'] = coordinates_by_video[video_id][4]['latitude']
-        billboard_details['longitude5'] = coordinates_by_video[video_id][4]['longitude']
-        billboard_details['speed5'] = coordinates_by_video[video_id][4]['speed']
-
-        billboard_details['latitude6'] = coordinates_by_video[video_id][5]['latitude']
-        billboard_details['longitude6'] = coordinates_by_video[video_id][5]['longitude']
-        billboard_details['speed6'] = coordinates_by_video[video_id][5]['speed']
+        for idx, coords in enumerate(coordinates_by_video[video_id]):
+            billboard_details['latitude' + str(idx)] = coords['latitude']
+            billboard_details['longitude'+ str(idx)] = coords['longitude']
+            billboard_details['speed'+ str(idx)] = coords['speed']
 
         response.append(billboard_details)
 
