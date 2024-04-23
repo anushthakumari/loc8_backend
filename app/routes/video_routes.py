@@ -9,7 +9,7 @@ from app.utils.helpers import generate_uuid
 from app.constants.roles import roles
 from app import socketio
 
-from app.utils.video_helpers import get_coordinates_from_video
+from app.utils.video_helpers import get_coordinates_from_video, compress_video
 
 video_bp = Blueprint('videos', __name__)
 
@@ -109,8 +109,12 @@ def upload(current_user):
         return jsonify({"error": "no file"})
 
     dest = os.path.join(AppConfig.UPLOAD_FOLDER, secure_filename(video_file.filename))
-    filename = secure_filename(generate_uuid() + ".mp4")
+    unique_id = generate_uuid()
+    filename = secure_filename("temp_" + unique_id + ".mp4")
     output_file_path = os.path.join(TARGET_VIDEO_PATH, filename)
+
+    comp_filename = secure_filename(unique_id + ".mp4")
+    compressed_file_path = os.path.join(TARGET_VIDEO_PATH, comp_filename)
 
     video_file.save(dest)
 
@@ -121,7 +125,13 @@ def upload(current_user):
     vcd2 = str(vcd)
     vcd3 = vcd2[0:2]
 
-    video_id = insert_video_data(output_file_path, filename, zone_id, state_id, city_id, current_user['id'])
+    socketio.emit('compress_progress', {'percentage': -1})
+
+    compress_video(output_file_path, compressed_file_path)
+
+    socketio.emit('compress_progress', {'percentage': 100})
+
+    video_id = insert_video_data(compressed_file_path, comp_filename, zone_id, state_id, city_id, current_user['id'])
     insert_billboard_data(video_id, current_user['id'], vcd)
 
     coordinate_tuples = get_coordinates_from_video(dest)
@@ -140,6 +150,7 @@ def upload(current_user):
     video_details = query_db(video_q, (video_id,), True)
 
     os.remove(dest)
+    os.remove(output_file_path)
 
     return jsonify({"billboards":  billboards, "video_details": video_details}), 200
     # return jsonify({"billboards":  "", "video_details": ""}), 200
@@ -174,6 +185,9 @@ def processed_output(current_user,video_id):
     """
 
     video_coordinates = query_db(video_q, (video_id,))
+
+    if not video_coordinates:
+        video_coordinates = []
 
     return jsonify({"billboards":  billboards, "video_details": video_details, 'video_coordinates': video_coordinates}), 200
 

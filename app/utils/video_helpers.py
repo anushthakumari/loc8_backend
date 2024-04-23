@@ -4,6 +4,7 @@ import requests
 import re
 import os
 import math
+import ffmpeg
 
 api_key = os.getenv('GOOGLE_VISION_API_KEY')
 
@@ -99,3 +100,8 @@ def detected_text_to_data(response_text=""):
         
     else:
         return None
+
+def compress_video(input_file, output_file):
+  input_stream = ffmpeg.input(input_file)
+  output_stream = input_stream.output(output_file, crf=18)
+  ffmpeg.run(output_stream)
