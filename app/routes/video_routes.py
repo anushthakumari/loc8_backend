@@ -168,7 +168,14 @@ def processed_output(current_user,video_id):
     """
     video_details = query_db(video_q, (video_id,), True)
 
-    return jsonify({"billboards":  billboards, "video_details": video_details}), 200
+    video_q = """
+        SELECT * FROM video_coordinates
+        WHERE video_id=%s
+    """
+
+    video_coordinates = query_db(video_q, (video_id,))
+
+    return jsonify({"billboards":  billboards, "video_details": video_details, 'video_coordinates': video_coordinates}), 200
 
 @video_bp.route('/billboards/merge', methods=['POST'])
 @token_required
