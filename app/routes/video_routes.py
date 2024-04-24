@@ -86,12 +86,13 @@ def get_all_videos(current_user):
                 """, (billboard_details['video_id'],))
             coordinates_by_video[video_id] = video_coordinates
 
-        for idx, coords in enumerate(coordinates_by_video[video_id]):
-            billboard_details['latitude' + str(idx)] = coords['latitude']
-            billboard_details['longitude'+ str(idx)] = coords['longitude']
-            billboard_details['speed'+ str(idx)] = coords['speed']
+        if coordinates_by_video[video_id]:
+            for idx, coords in enumerate(coordinates_by_video[video_id]):
+                billboard_details['latitude' + str(idx)] = coords['latitude']
+                billboard_details['longitude'+ str(idx)] = coords['longitude']
+                billboard_details['speed'+ str(idx)] = coords['speed']
 
-        response.append(billboard_details)
+            response.append(billboard_details)
 
     
     return jsonify(video_details), 200
