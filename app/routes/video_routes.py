@@ -126,14 +126,17 @@ def upload(current_user):
     vcd2 = str(vcd)
     vcd3 = vcd2[0:2]
 
-    socketio.emit('compress_progress', {'percentage': -1})
+    # socketio.emit('compress_progress', {'percentage': -1})
 
-    compress_video(output_file_path, compressed_file_path)
+    # compress_video(output_file_path, compressed_file_path)
 
-    socketio.emit('compress_progress', {'percentage': 100})
+    # socketio.emit('compress_progress', {'percentage': 100})
 
-    video_id = insert_video_data(compressed_file_path, comp_filename, zone_id, state_id, city_id, current_user['id'])
+    video_id = insert_video_data(output_file_path, filename, zone_id, state_id, city_id, current_user['id'])
     insert_billboard_data(video_id, current_user['id'], vcd)
+
+    # video_id = insert_video_data(compressed_file_path, comp_filename, zone_id, state_id, city_id, current_user['id'])
+    # insert_billboard_data(video_id, current_user['id'], vcd)
 
     coordinate_tuples = get_coordinates_from_video(dest)
 
@@ -151,7 +154,7 @@ def upload(current_user):
     video_details = query_db(video_q, (video_id,), True)
 
     os.remove(dest)
-    os.remove(output_file_path)
+    # os.remove(output_file_path)
 
     return jsonify({"billboards":  billboards, "video_details": video_details}), 200
     # return jsonify({"billboards":  "", "video_details": ""}), 200
