@@ -526,11 +526,12 @@ def download_plan(current_user, brief_id):
             plan_slide = prs.slides.add_slide(blank_slide_layout)
 
             # heading
-            title_shape = plan_slide.shapes.add_textbox(Inches(0.2), Inches(0.2), Inches(4.5), Inches(0.8))
+            title_shape = plan_slide.shapes.add_textbox(Inches(0.2), Inches(0.2), Inches(4.8), Inches(0.8))
             title_text_frame = title_shape.text_frame
             title_text_frame.text = "{}   {}".format(location, size_text)
+            title_text_frame.word_wrap = True
             p = title_text_frame.paragraphs[0]
-            p.font.size = Inches(0.3)
+            p.font.size = Inches(0.23)
             p.font.color.rgb = RGBColor(255, 165, 0)
 
             title_shape.fill.solid()
