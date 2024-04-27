@@ -92,6 +92,12 @@ def get_all_videos(current_user):
                 billboard_details['longitude'+ str(idx)] = coords['longitude']
                 billboard_details['speed'+ str(idx)] = coords['speed']
 
+        else:
+            for idx in range(6):
+                billboard_details['latitude' + str(idx)] = 0
+                billboard_details['longitude'+ str(idx)] = 0
+                billboard_details['speed'+ str(idx)] = 0
+
             response.append(billboard_details)
 
     
